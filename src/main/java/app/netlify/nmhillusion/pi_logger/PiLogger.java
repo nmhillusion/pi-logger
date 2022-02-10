@@ -13,7 +13,7 @@ import java.util.Calendar;
  */
 
 public class PiLogger {
-    private static final String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
+    private static final String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS";
     private final static DateFormat dateFormat = new SimpleDateFormat(DATE_PATTERN);
 
     private final Class<?> loggerClass;
@@ -62,12 +62,20 @@ public class PiLogger {
         debug(logMessage, null);
     }
 
+    public void debug(Throwable throwable) {
+        debug(throwable.getMessage(), throwable);
+    }
+
     public void debug(String logMessage, Throwable throwable) {
         doLog(LogLevel.DEBUG, logMessage, throwable);
     }
 
     public void info(String logMessage) {
         info(logMessage, null);
+    }
+
+    public void info(Throwable throwable) {
+        info(throwable.getMessage(), throwable);
     }
 
     public void info(String logMessage, Throwable throwable) {
@@ -78,12 +86,20 @@ public class PiLogger {
         warn(logMessage, null);
     }
 
+    public void warn(Throwable throwable) {
+        warn(throwable.getMessage(), throwable);
+    }
+
     public void warn(String logMessage, Throwable throwable) {
         doLog(LogLevel.WARN, logMessage, throwable);
     }
 
     public void error(String logMessage) {
         error(logMessage, null);
+    }
+
+    public void error(Throwable throwable) {
+        error(throwable.getMessage(), throwable);
     }
 
     public void error(String logMessage, Throwable throwable) {
