@@ -2,6 +2,8 @@ package app.netlify.nmhillusion.pi_logger;
 
 import org.junit.jupiter.api.Test;
 
+import java.sql.SQLException;
+
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PiLoggerHelperTest {
@@ -27,6 +29,7 @@ class PiLoggerHelperTest {
     @Test
     void testError() {
         PiLoggerHelper.getLog(this).error("do test error message");
+        PiLoggerHelper.getLog(this).error("do test error message with exception: ", new SQLException("Random Fatal Error"));
         assertTrue(true, "OK");
     }
 
