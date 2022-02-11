@@ -1,5 +1,6 @@
 package app.netlify.nmhillusion.pi_logger;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
@@ -7,6 +8,16 @@ import java.sql.SQLException;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PiLoggerHelperTest {
+
+    @BeforeAll
+    static void init() {
+        PiLoggerHelper.getLogConfig()
+                .setColoring(true)
+                .setDisplayLineNumber(true)
+                .setTimestampPattern("dd/MM/yyyy HH:mm")
+        ;
+    }
+
 
     @Test
     void testDebug() {
