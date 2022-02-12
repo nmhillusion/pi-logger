@@ -8,7 +8,7 @@ package app.netlify.nmhillusion.pi_logger.constant;
  */
 public enum LogLevel {
     DEBUG("DEBUG", AnsiColor.ANSI_PURPLE),
-    INFO("INFO", AnsiColor.ANSI_CYAN),
+    INFO("INFO", AnsiColor.ANSI_GREEN),
     WARN("WARN", AnsiColor.ANSI_YELLOW),
     ERROR("ERROR", AnsiColor.ANSI_RED),
     ;
