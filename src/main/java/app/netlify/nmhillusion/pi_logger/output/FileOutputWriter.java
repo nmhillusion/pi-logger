@@ -18,9 +18,8 @@ public class FileOutputWriter extends IOutputWriter {
     private FileOutputStream fileOutputStream;
     private PrintStream printStream;
 
-    public FileOutputWriter(String logFilePath) {
+    public void setOutputLogFile(String logFilePath) {
         try {
-
             final File logFile = new File(logFilePath);
             if (!logFile.exists()) {
                 final boolean createdFile = logFile.createNewFile();

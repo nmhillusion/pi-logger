@@ -1,8 +1,6 @@
 package app.netlify.nmhillusion.pi_logger;
 
 import app.netlify.nmhillusion.pi_logger.model.LogConfigModel;
-import app.netlify.nmhillusion.pi_logger.output.ConsoleOutputWriter;
-import app.netlify.nmhillusion.pi_logger.output.FileOutputWriter;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,12 +14,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PiLoggerHelper {
     private static final Map<String, PiLogger> loggerFactory = new ConcurrentHashMap<>();
     private static final String DEFAULT_DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS";
+    private static final String DEFAULT_LOG_FILE_PATH = "output.log";
     private static final LogConfigModel logConfig = new LogConfigModel()
             .setColoring(false)
             .setDisplayLineNumber(true)
-            .setTimestampPattern(DEFAULT_DATE_PATTERN);
-    private static final ConsoleOutputWriter consoleOutputWriter = new ConsoleOutputWriter();
-    private static final FileOutputWriter fileOutputWriter = new FileOutputWriter("output.log");
+            .setTimestampPattern(DEFAULT_DATE_PATTERN)
+            .setLogFilePath(DEFAULT_LOG_FILE_PATH)
+            .setOutputToFile(false);
 
     public static LogConfigModel getLogConfig() {
         return logConfig;
@@ -40,9 +39,6 @@ public class PiLoggerHelper {
             return loggerFactory.get(loggerKey);
         } else {
             final PiLogger piLogger = new PiLogger(loggerClass, logConfig);
-            piLogger.addOutputWriter(consoleOutputWriter);
-            piLogger.addOutputWriter(fileOutputWriter);
-
             loggerFactory.put(loggerKey, piLogger);
 
             return piLogger;

@@ -14,6 +14,10 @@ public class LogConfigModel implements Serializable {
     private boolean coloring;
     private String timestampPattern;
     private boolean displayLineNumber;
+
+    private boolean outputToFile = false;
+    private String logFilePath;
+
     private OnChangeConfig onChangeConfig;
 
     private void triggerOnChangeConfig() {
@@ -61,6 +65,27 @@ public class LogConfigModel implements Serializable {
 
     public LogConfigModel setOnChangeConfig(OnChangeConfig onChangeConfig) {
         this.onChangeConfig = onChangeConfig;
+        triggerOnChangeConfig();
+        return this;
+    }
+
+    public boolean getOutputToFile() {
+        return outputToFile;
+    }
+
+    public LogConfigModel setOutputToFile(boolean outputToFile) {
+        this.outputToFile = outputToFile;
+        triggerOnChangeConfig();
+        return this;
+    }
+
+    public String getLogFilePath() {
+        return logFilePath;
+    }
+
+    public LogConfigModel setLogFilePath(String logFilePath) {
+        this.logFilePath = logFilePath;
+        triggerOnChangeConfig();
         return this;
     }
 }

@@ -4,6 +4,8 @@ import app.netlify.nmhillusion.pi_logger.constant.AnsiColor;
 import app.netlify.nmhillusion.pi_logger.constant.LogLevel;
 import app.netlify.nmhillusion.pi_logger.constant.StringConstant;
 import app.netlify.nmhillusion.pi_logger.model.LogConfigModel;
+import app.netlify.nmhillusion.pi_logger.output.ConsoleOutputWriter;
+import app.netlify.nmhillusion.pi_logger.output.FileOutputWriter;
 import app.netlify.nmhillusion.pi_logger.output.IOutputWriter;
 
 import java.io.IOException;
@@ -31,6 +33,8 @@ public class PiLogger {
                     " -- " +
                     AnsiColor.ANSI_PURPLE + "$LOG_NAME.$METHOD_NAME()" + AnsiColor.ANSI_RESET +
                     "$LINE_NUMBER : $LOG_MESSAGE";
+    private static final ConsoleOutputWriter consoleOutputWriter = new ConsoleOutputWriter();
+    private static final FileOutputWriter fileOutputWriter = new FileOutputWriter();
 
     private final LogConfigModel logConfig;
     private final SimpleDateFormat dateFormat;
@@ -42,11 +46,28 @@ public class PiLogger {
         this.loggerClass = loggerClass;
         this.dateFormat = new SimpleDateFormat(logConfig.getTimestampPattern());
         this.logConfig = logConfig;
+
         TEMPLATE_REF.set(logConfig.getColoring() ? COLOR_TEMPLATE : NORMAL_TEMPLATE);
+
+        logOutputWriters.add(consoleOutputWriter);
+        if (logConfig.getOutputToFile()) {
+            fileOutputWriter.setOutputLogFile(logConfig.getLogFilePath());
+            logOutputWriters.add(fileOutputWriter);
+        }
 
         this.logConfig.setOnChangeConfig(newConfig -> {
             dateFormat.applyPattern(newConfig.getTimestampPattern());
             TEMPLATE_REF.set(newConfig.getColoring() ? COLOR_TEMPLATE : NORMAL_TEMPLATE);
+
+            if (logConfig.getOutputToFile()) {
+                fileOutputWriter.setOutputLogFile(logConfig.getLogFilePath());
+
+                if (!logOutputWriters.contains(fileOutputWriter)) {
+                    logOutputWriters.add(fileOutputWriter);
+                }
+            } else {
+                logOutputWriters.removeIf(writer -> writer instanceof FileOutputWriter);
+            }
         });
     }
 
