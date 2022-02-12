@@ -4,7 +4,6 @@ import app.netlify.nmhillusion.pi_logger.constant.AnsiColor;
 import app.netlify.nmhillusion.pi_logger.constant.LogLevel;
 import app.netlify.nmhillusion.pi_logger.model.LogConfigModel;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -28,16 +27,20 @@ public class PiLogger {
                     "$LINE_NUMBER : $LOG_MESSAGE";
 
     private final LogConfigModel logConfig;
-    private final DateFormat dateFormat;
+    private final SimpleDateFormat dateFormat;
     private final Class<?> loggerClass;
-    private final String TEMPLATE;
+    private String TEMPLATE;
 
     public PiLogger(Class<?> loggerClass, LogConfigModel logConfig) {
         this.loggerClass = loggerClass;
-        this.logConfig = logConfig;
         this.dateFormat = new SimpleDateFormat(logConfig.getTimestampPattern());
-
+        this.logConfig = logConfig;
         TEMPLATE = logConfig.getColoring() ? COLOR_TEMPLATE : NORMAL_TEMPLATE;
+
+        this.logConfig.setOnChangeConfig(newConfig -> {
+            dateFormat.applyPattern(newConfig.getTimestampPattern());
+            TEMPLATE = newConfig.getColoring() ? COLOR_TEMPLATE : NORMAL_TEMPLATE;
+        });
     }
 
     private StackTraceElement getLogStackTraceElement() {

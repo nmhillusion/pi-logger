@@ -1,5 +1,7 @@
 package app.netlify.nmhillusion.pi_logger.model;
 
+import app.netlify.nmhillusion.pi_logger.listener.OnChangeConfig;
+
 import java.io.Serializable;
 
 /**
@@ -12,6 +14,13 @@ public class LogConfigModel implements Serializable {
     private boolean coloring;
     private String timestampPattern;
     private boolean displayLineNumber;
+    private OnChangeConfig onChangeConfig;
+
+    private void triggerOnChangeConfig() {
+        if (null != onChangeConfig) {
+            onChangeConfig.onChange(this);
+        }
+    }
 
     public boolean getColoring() {
         return coloring;
@@ -19,6 +28,8 @@ public class LogConfigModel implements Serializable {
 
     public LogConfigModel setColoring(boolean coloring) {
         this.coloring = coloring;
+        triggerOnChangeConfig();
+
         return this;
     }
 
@@ -28,6 +39,8 @@ public class LogConfigModel implements Serializable {
 
     public LogConfigModel setTimestampPattern(String timestampPattern) {
         this.timestampPattern = timestampPattern;
+        triggerOnChangeConfig();
+
         return this;
     }
 
@@ -37,6 +50,17 @@ public class LogConfigModel implements Serializable {
 
     public LogConfigModel setDisplayLineNumber(boolean displayLineNumber) {
         this.displayLineNumber = displayLineNumber;
+        triggerOnChangeConfig();
+
+        return this;
+    }
+
+    public OnChangeConfig getOnChangeConfig() {
+        return onChangeConfig;
+    }
+
+    public LogConfigModel setOnChangeConfig(OnChangeConfig onChangeConfig) {
+        this.onChangeConfig = onChangeConfig;
         return this;
     }
 }
