@@ -3,6 +3,7 @@ package app.netlify.nmhillusion.pi_logger.model;
 import app.netlify.nmhillusion.pi_logger.listener.OnChangeConfig;
 
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * date: 2022-02-11
@@ -84,6 +85,13 @@ public class LogConfigModel implements Serializable {
     }
 
     public LogConfigModel setLogFilePath(String logFilePath) {
+        final Map<String, String> environments = System.getenv();
+        for (String envKey : environments.keySet()) {
+            logFilePath = logFilePath
+                    .replace("%" + envKey.toLowerCase() + "%", environments.get(envKey))
+                    .replace("%" + envKey.toUpperCase() + "%", environments.get(envKey));
+        }
+
         this.logFilePath = logFilePath;
         triggerOnChangeConfig();
         return this;
