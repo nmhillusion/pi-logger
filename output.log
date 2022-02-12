@@ -1,0 +1,2 @@
+2022-02-12T12:43:27.504 -- [INFO] -- [main] -- app.netlify.nmhillusion.pi_logger.ColorLogTest.coloring():19 : log with color
+2022-02-12T12:43:27.514 -- [INFO] -- [main] -- app.netlify.nmhillusion.pi_logger.ColorLogTest.withoutColoring():32 : log without color

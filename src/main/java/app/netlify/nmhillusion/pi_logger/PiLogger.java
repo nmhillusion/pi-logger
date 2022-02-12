@@ -2,10 +2,16 @@ package app.netlify.nmhillusion.pi_logger;
 
 import app.netlify.nmhillusion.pi_logger.constant.AnsiColor;
 import app.netlify.nmhillusion.pi_logger.constant.LogLevel;
+import app.netlify.nmhillusion.pi_logger.constant.StringConstant;
 import app.netlify.nmhillusion.pi_logger.model.LogConfigModel;
+import app.netlify.nmhillusion.pi_logger.output.IOutputWriter;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * date: 2022-02-08
@@ -29,18 +35,25 @@ public class PiLogger {
     private final LogConfigModel logConfig;
     private final SimpleDateFormat dateFormat;
     private final Class<?> loggerClass;
-    private String TEMPLATE;
+    private final AtomicReference<String> TEMPLATE_REF = new AtomicReference<>();
+    private final List<IOutputWriter> logOutputWriters = new ArrayList<>();
 
     public PiLogger(Class<?> loggerClass, LogConfigModel logConfig) {
         this.loggerClass = loggerClass;
         this.dateFormat = new SimpleDateFormat(logConfig.getTimestampPattern());
         this.logConfig = logConfig;
-        TEMPLATE = logConfig.getColoring() ? COLOR_TEMPLATE : NORMAL_TEMPLATE;
+        TEMPLATE_REF.set(logConfig.getColoring() ? COLOR_TEMPLATE : NORMAL_TEMPLATE);
 
         this.logConfig.setOnChangeConfig(newConfig -> {
             dateFormat.applyPattern(newConfig.getTimestampPattern());
-            TEMPLATE = newConfig.getColoring() ? COLOR_TEMPLATE : NORMAL_TEMPLATE;
+            TEMPLATE_REF.set(newConfig.getColoring() ? COLOR_TEMPLATE : NORMAL_TEMPLATE);
         });
+    }
+
+    public void addOutputWriter(IOutputWriter outputWriter) {
+        if (null != outputWriter) {
+            logOutputWriters.add(outputWriter);
+        }
     }
 
     private StackTraceElement getLogStackTraceElement() {
@@ -61,35 +74,41 @@ public class PiLogger {
     }
 
     private void doLog(LogLevel logLevel, String logMessage, Throwable throwable) {
-        final StackTraceElement logStackTraceElement = getLogStackTraceElement();
+        try {
+            final StackTraceElement logStackTraceElement = getLogStackTraceElement();
 
-        String finalLogMessage = TEMPLATE
-                .replace("$TIMESTAMP", dateFormat.format(Calendar.getInstance().getTime()))
-                .replace("$LOG_LEVEL", logLevel.getValue())
-                .replace("$THREAD_NAME", Thread.currentThread().getName())
-                .replace("$LOG_NAME", loggerClass.getName())
-                .replace("$LOG_MESSAGE", logMessage)
-                .replace("$METHOD_NAME", logStackTraceElement != null ? logStackTraceElement.getMethodName() : "");
+            String finalLogMessage = TEMPLATE_REF.get()
+                    .replace("$TIMESTAMP", dateFormat.format(Calendar.getInstance().getTime()))
+                    .replace("$LOG_LEVEL", logLevel.getValue())
+                    .replace("$THREAD_NAME", Thread.currentThread().getName())
+                    .replace("$LOG_NAME", loggerClass.getName())
+                    .replace("$LOG_MESSAGE", logMessage)
+                    .replace("$METHOD_NAME", logStackTraceElement != null ? logStackTraceElement.getMethodName() : StringConstant.EMPTY);
 
-        if (logConfig.getColoring()) {
-            finalLogMessage = finalLogMessage
-                    .replace("$ANSI_COLOR", logLevel.getColor());
+            if (logConfig.getColoring()) {
+                finalLogMessage = finalLogMessage
+                        .replace("$ANSI_COLOR", logLevel.getColor());
+            }
+
+            if (logConfig.getDisplayLineNumber()) {
+                finalLogMessage = finalLogMessage
+                        .replace("$LINE_NUMBER",
+                                ":" + (logStackTraceElement != null ?
+                                        logStackTraceElement.getLineNumber() : 0));
+            } else {
+                finalLogMessage = finalLogMessage
+                        .replace("$LINE_NUMBER", StringConstant.EMPTY);
+            }
+
+            doWriteToOutputs(finalLogMessage, throwable);
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
+    }
 
-        if (logConfig.getDisplayLineNumber()) {
-            finalLogMessage = finalLogMessage
-                    .replace("$LINE_NUMBER",
-                            ":" + (logStackTraceElement != null ?
-                                    logStackTraceElement.getLineNumber() : 0));
-        } else {
-            finalLogMessage = finalLogMessage
-                    .replace("$LINE_NUMBER", "");
-        }
-
-        System.out.println(finalLogMessage);
-
-        if (null != throwable) {
-            throwable.printStackTrace();
+    private void doWriteToOutputs(String logMessage, Throwable throwable) throws IOException {
+        for (IOutputWriter outputWriter : logOutputWriters) {
+            outputWriter.doOutput(logMessage, throwable);
         }
     }
 
