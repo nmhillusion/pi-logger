@@ -42,7 +42,7 @@ public class PiLogger {
     private final AtomicReference<String> TEMPLATE_REF = new AtomicReference<>();
     private final List<IOutputWriter> logOutputWriters = new ArrayList<>();
 
-    public PiLogger(Class<?> loggerClass, LogConfigModel logConfig) {
+    protected PiLogger(Class<?> loggerClass, LogConfigModel logConfig) {
         this.loggerClass = loggerClass;
         this.dateFormat = new SimpleDateFormat(logConfig.getTimestampPattern());
         this.logConfig = logConfig;
