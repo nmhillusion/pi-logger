@@ -18,6 +18,18 @@ class PiLoggerHelperTest {
         ;
     }
 
+    @Test
+    void testTrace() {
+        PiLoggerFactory.getLogConfig()
+                .setLogLevel(LogLevel.TRACE);
+
+        PiLoggerFactory.getLog(this).trace("do test trace message");
+
+        PiLoggerFactory.getLogConfig()
+                .setLogLevel(LogLevel.INFO);
+
+        PiLoggerFactory.getLog(this).trace("will not log this message");
+    }
 
     @Test
     void testDebug() {

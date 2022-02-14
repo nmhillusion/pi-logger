@@ -57,8 +57,8 @@ public class PiLogger {
 
         this.logConfig.setOnChangeConfig(this::registerOnChangeConfig);
     }
-    
-    private void registerOnChangeConfig(LogConfigModel newConfig){
+
+    private void registerOnChangeConfig(LogConfigModel newConfig) {
         dateFormat.applyPattern(newConfig.getTimestampPattern());
         TEMPLATE_REF.set(newConfig.getColoring() ? COLOR_TEMPLATE : NORMAL_TEMPLATE);
 
@@ -100,7 +100,7 @@ public class PiLogger {
         if (logLevel.getPriority() < this.logConfig.getLogLevel().getPriority()) {
             return; // not log this because user dont want to write log in this log level
         }
-        
+
         try {
             final StackTraceElement logStackTraceElement = getLogStackTraceElement();
 
@@ -137,6 +137,18 @@ public class PiLogger {
         for (IOutputWriter outputWriter : logOutputWriters) {
             outputWriter.doOutput(logMessage, throwable);
         }
+    }
+
+    public void trace(String logMessage) {
+        trace(logMessage, null);
+    }
+
+    public void trace(Throwable throwable) {
+        trace(throwable.getMessage(), throwable);
+    }
+
+    public void trace(String logMessage, Throwable throwable) {
+        doLog(LogLevel.TRACE, logMessage, throwable);
     }
 
     public void debug(String logMessage) {
