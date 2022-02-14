@@ -10,7 +10,7 @@ class PiLoggerHelperTest {
 
     @BeforeAll
     static void init() {
-        PiLoggerHelper.getLogConfig()
+        PiLoggerFactory.getLogConfig()
                 .setColoring(true)
                 .setDisplayLineNumber(true)
                 .setTimestampPattern("yyyy-MM-dd HH:mm:ss.SSS")
@@ -21,52 +21,52 @@ class PiLoggerHelperTest {
 
     @Test
     void testDebug() {
-        PiLoggerHelper.getLogConfig()
+        PiLoggerFactory.getLogConfig()
                 .setLogLevel(LogLevel.DEBUG);
 
-        PiLoggerHelper.getLog(this).debug("do test debug message");
+        PiLoggerFactory.getLog(this).debug("do test debug message");
 
-        PiLoggerHelper.getLogConfig()
+        PiLoggerFactory.getLogConfig()
                 .setLogLevel(LogLevel.INFO);
 
-        PiLoggerHelper.getLog(this).debug("will not log this message");
+        PiLoggerFactory.getLog(this).debug("will not log this message");
     }
 
     @Test
     void testInfo() {
-        PiLoggerHelper.getLogConfig()
+        PiLoggerFactory.getLogConfig()
                 .setLogLevel(LogLevel.INFO);
 
-        PiLoggerHelper.getLog(this).info("do test info message");
+        PiLoggerFactory.getLog(this).info("do test info message");
 
-        PiLoggerHelper.getLogConfig()
+        PiLoggerFactory.getLogConfig()
                 .setLogLevel(LogLevel.WARN);
 
-        PiLoggerHelper.getLog(this).info("will not log this message");
+        PiLoggerFactory.getLog(this).info("will not log this message");
     }
 
     @Test
     void testWarn() {
-        PiLoggerHelper.getLogConfig()
+        PiLoggerFactory.getLogConfig()
                 .setLogLevel(LogLevel.WARN);
 
-        PiLoggerHelper.getLog(this).warn("do test warn message");
+        PiLoggerFactory.getLog(this).warn("do test warn message");
 
-        PiLoggerHelper.getLogConfig()
+        PiLoggerFactory.getLogConfig()
                 .setLogLevel(LogLevel.ERROR);
 
-        PiLoggerHelper.getLog(this).warn("will not log this message");
+        PiLoggerFactory.getLog(this).warn("will not log this message");
     }
 
     @Test
     void testError() {
-        PiLoggerHelper.getLogConfig()
+        PiLoggerFactory.getLogConfig()
                 .setLogLevel(LogLevel.INFO);
 
-        PiLoggerHelper.getLog(this).error("do test error message with exception: ", new SQLException("Random Fatal Error"));
+        PiLoggerFactory.getLog(this).error("do test error message with exception: ", new SQLException("Random Fatal Error"));
 
-        PiLoggerHelper.getLogConfig()
+        PiLoggerFactory.getLogConfig()
                 .setLogLevel(LogLevel.ERROR);
-        PiLoggerHelper.getLog(this).error("do test error message");
+        PiLoggerFactory.getLog(this).error("do test error message");
     }
 }

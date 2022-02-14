@@ -11,19 +11,19 @@ import org.junit.jupiter.api.Test;
 public class LineNumberLogTest {
     @Test
     void testLineNumber() {
-        PiLoggerHelper.getLogConfig()
+        PiLoggerFactory.getLogConfig()
                 .setColoring(true)
                 .setDisplayLineNumber(true);
 
-        PiLoggerHelper.getLog(this).info("lineNumber");
+        PiLoggerFactory.getLog(this).info("lineNumber");
     }
 
     @Test
     void testNoLineNumber() {
-        PiLoggerHelper.getLogConfig()
+        PiLoggerFactory.getLogConfig()
                 .setColoring(true)
                 .setDisplayLineNumber(false);
 
-        PiLoggerHelper.getLog(this).info("noLineNumber");
+        PiLoggerFactory.getLog(this).info("noLineNumber");
     }
 }

@@ -19,15 +19,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class FileLogTest {
     @Test
     void testWriteFile() {
-        PiLoggerHelper.getLogConfig()
+        PiLoggerFactory.getLogConfig()
                 .setColoring(true)
                 .setOutputToFile(true)
         ;
 
         final String message = "write log to file";
-        PiLoggerHelper.getLog(this).info(message);
+        PiLoggerFactory.getLog(this).info(message);
 
-        final File logFile = new File(PiLoggerHelper.getLogConfig().getLogFilePath());
+        final File logFile = new File(PiLoggerFactory.getLogConfig().getLogFilePath());
         try {
             final byte[] bytes = Files.readAllBytes(Paths.get(logFile.toURI()));
             assertTrue(new String(bytes).contains(message), "Contains message in log file.");
@@ -38,15 +38,15 @@ public class FileLogTest {
 
     @Test
     void testNoWriteFile() {
-        PiLoggerHelper.getLogConfig()
+        PiLoggerFactory.getLogConfig()
                 .setColoring(true)
                 .setOutputToFile(false)
         ;
 
         final String message = "don't write log to file";
-        PiLoggerHelper.getLog(this).info(message);
+        PiLoggerFactory.getLog(this).info(message);
 
-        final File logFile = new File(PiLoggerHelper.getLogConfig().getLogFilePath());
+        final File logFile = new File(PiLoggerFactory.getLogConfig().getLogFilePath());
         try {
             final byte[] bytes = Files.readAllBytes(Paths.get(logFile.toURI()));
             assertFalse(new String(bytes).contains(message), "Not contains message in log file.");

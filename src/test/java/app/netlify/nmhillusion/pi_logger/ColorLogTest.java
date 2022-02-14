@@ -12,24 +12,24 @@ public class ColorLogTest {
 
     @Test
     void testColoring() {
-        PiLoggerHelper.getLogConfig()
+        PiLoggerFactory.getLogConfig()
                 .setColoring(true)
         ;
 
-        PiLoggerHelper.getLog(this).info("log with color");
+        PiLoggerFactory.getLog(this).info("log with color");
 
-        PiLoggerHelper.getLogConfig()
+        PiLoggerFactory.getLogConfig()
                 .setColoring(false)
         ;
     }
 
     @Test
     void testWithoutColoring() {
-        PiLoggerHelper.getLogConfig()
+        PiLoggerFactory.getLogConfig()
                 .setColoring(false)
         ;
 
-        PiLoggerHelper.getLog(this).info("log without color");
+        PiLoggerFactory.getLog(this).info("log without color");
     }
 
 }
