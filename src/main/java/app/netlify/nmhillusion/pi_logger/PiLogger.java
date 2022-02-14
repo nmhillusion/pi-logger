@@ -97,7 +97,7 @@ public class PiLogger {
     }
 
     private void doLog(LogLevel logLevel, String logMessage, Throwable throwable) {
-        if (logLevel.getPriority() < this.logConfig.getPriority()) {
+        if (logLevel.getPriority() < this.logConfig.getLogLevel().getPriority()) {
             return; // not log this because user dont want to write log in this log level
         }
         

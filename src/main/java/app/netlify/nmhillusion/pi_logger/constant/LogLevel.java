@@ -24,7 +24,7 @@ public enum LogLevel {
         this.color = color;
     }
 
-    public String getPriority() {
+    public int getPriority() {
         return priority;
     }
     

@@ -1,5 +1,6 @@
 package app.netlify.nmhillusion.pi_logger;
 
+import app.netlify.nmhillusion.pi_logger.constant.LogLevel;
 import app.netlify.nmhillusion.pi_logger.model.LogConfigModel;
 
 import java.util.Map;
@@ -20,7 +21,8 @@ public class PiLoggerHelper {
             .setDisplayLineNumber(true)
             .setTimestampPattern(DEFAULT_DATE_PATTERN)
             .setLogFilePath(DEFAULT_LOG_FILE_PATH)
-            .setOutputToFile(false);
+            .setOutputToFile(false)
+            .setLogLevel(LogLevel.INFO);
 
     public static LogConfigModel getLogConfig() {
         return logConfig;
