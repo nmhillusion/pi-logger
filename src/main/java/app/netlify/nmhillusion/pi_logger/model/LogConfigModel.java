@@ -1,6 +1,7 @@
 package app.netlify.nmhillusion.pi_logger.model;
 
 import app.netlify.nmhillusion.pi_logger.listener.OnChangeConfig;
+import app.netlify.nmhillusion.pi_logger.constant.LogLevel;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -15,6 +16,7 @@ public class LogConfigModel implements Serializable {
     private boolean coloring;
     private String timestampPattern;
     private boolean displayLineNumber;
+    private LogLevel logLevel;
 
     private boolean outputToFile = false;
     private String logFilePath;
@@ -58,6 +60,16 @@ public class LogConfigModel implements Serializable {
         triggerOnChangeConfig();
 
         return this;
+    }
+    
+    public LogLevel getLogLevel(){
+        return logLevel;
+    }
+    
+    public LogConfigModel setLogLevel(LogLevel logLevel){
+        this.logLevel = logLevel;
+        triggerOnChangeConfig();
+        return this;   
     }
 
     public OnChangeConfig getOnChangeConfig() {
