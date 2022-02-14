@@ -55,20 +55,22 @@ public class PiLogger {
             logOutputWriters.add(fileOutputWriter);
         }
 
-        this.logConfig.setOnChangeConfig(newConfig -> {
-            dateFormat.applyPattern(newConfig.getTimestampPattern());
-            TEMPLATE_REF.set(newConfig.getColoring() ? COLOR_TEMPLATE : NORMAL_TEMPLATE);
+        this.logConfig.setOnChangeConfig(this::registerOnChangeConfig);
+    }
+    
+    private void registerOnChangeConfig(LogConfigModel newConfig){
+        dateFormat.applyPattern(newConfig.getTimestampPattern());
+        TEMPLATE_REF.set(newConfig.getColoring() ? COLOR_TEMPLATE : NORMAL_TEMPLATE);
 
-            if (logConfig.getOutputToFile()) {
-                fileOutputWriter.setOutputLogFile(logConfig.getLogFilePath());
+        if (logConfig.getOutputToFile()) {
+            fileOutputWriter.setOutputLogFile(logConfig.getLogFilePath());
 
-                if (!logOutputWriters.contains(fileOutputWriter)) {
-                    logOutputWriters.add(fileOutputWriter);
-                }
-            } else {
-                logOutputWriters.removeIf(writer -> writer instanceof FileOutputWriter);
+            if (!logOutputWriters.contains(fileOutputWriter)) {
+                logOutputWriters.add(fileOutputWriter);
             }
-        });
+        } else {
+            logOutputWriters.removeIf(writer -> writer instanceof FileOutputWriter);
+        }
     }
 
     public void addOutputWriter(IOutputWriter outputWriter) {
