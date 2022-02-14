@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 public class LineNumberLogTest {
     @Test
-    void lineNumberTest() {
+    void testLineNumber() {
         PiLoggerHelper.getLogConfig()
                 .setColoring(true)
                 .setDisplayLineNumber(true);
@@ -19,7 +19,7 @@ public class LineNumberLogTest {
     }
 
     @Test
-    void noLineNumberTest() {
+    void testNoLineNumber() {
         PiLoggerHelper.getLogConfig()
                 .setColoring(true)
                 .setDisplayLineNumber(false);

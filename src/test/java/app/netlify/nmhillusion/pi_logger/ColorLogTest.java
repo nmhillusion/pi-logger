@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 public class ColorLogTest {
 
     @Test
-    void coloring() {
+    void testColoring() {
         PiLoggerHelper.getLogConfig()
                 .setColoring(true)
         ;
@@ -24,7 +24,7 @@ public class ColorLogTest {
     }
 
     @Test
-    void withoutColoring() {
+    void testWithoutColoring() {
         PiLoggerHelper.getLogConfig()
                 .setColoring(false)
         ;
