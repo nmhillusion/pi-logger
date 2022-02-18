@@ -44,6 +44,9 @@ public class PiLogger {
 
     protected PiLogger(Class<?> loggerClass, LogConfigModel logConfig) {
         this.loggerClass = loggerClass;
+    }
+    
+    public PiLogger setLogConfig(LogConfigModel newConfig){
         this.dateFormat = new SimpleDateFormat(logConfig.getTimestampPattern());
         this.logConfig = logConfig;
 
