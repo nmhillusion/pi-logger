@@ -37,18 +37,19 @@ public class PiLogger {
     private static final FileOutputWriter fileOutputWriter = new FileOutputWriter();
 
     private final LogConfigModel logConfig;
-    private final SimpleDateFormat dateFormat;
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat();
     private final Class<?> loggerClass;
     private final AtomicReference<String> TEMPLATE_REF = new AtomicReference<>();
     private final List<IOutputWriter> logOutputWriters = new ArrayList<>();
 
     protected PiLogger(Class<?> loggerClass, LogConfigModel logConfig) {
         this.loggerClass = loggerClass;
+        setLogConfig(logConfig);
     }
     
     public PiLogger setLogConfig(LogConfigModel newConfig){
-        this.dateFormat = new SimpleDateFormat(logConfig.getTimestampPattern());
         this.logConfig = logConfig;
+        dateFormat.applyPattern(newConfig.getTimestampPattern());
 
         TEMPLATE_REF.set(logConfig.getColoring() ? COLOR_TEMPLATE : NORMAL_TEMPLATE);
 
