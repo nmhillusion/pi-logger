@@ -16,16 +16,15 @@ public class PiLoggerFactory {
     private static final Map<String, PiLogger> loggerFactory = new ConcurrentHashMap<>();
     private static final String DEFAULT_DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS";
     private static final String DEFAULT_LOG_FILE_PATH = "output.log";
-    private static final LogConfigModel logConfig = new LogConfigModel()
-            .setColoring(false)
-            .setDisplayLineNumber(true)
-            .setTimestampPattern(DEFAULT_DATE_PATTERN)
-            .setLogFilePath(DEFAULT_LOG_FILE_PATH)
-            .setOutputToFile(false)
-            .setLogLevel(LogLevel.INFO);
 
     public static LogConfigModel getLogConfig() {
-        return logConfig;
+        return new LogConfigModel()
+                .setColoring(false)
+                .setDisplayLineNumber(true)
+                .setTimestampPattern(DEFAULT_DATE_PATTERN)
+                .setLogFilePath(DEFAULT_LOG_FILE_PATH)
+                .setOutputToFile(false)
+                .setLogLevel(LogLevel.INFO);
     }
 
     public static PiLogger getLog(Object client) {
@@ -40,7 +39,7 @@ public class PiLoggerFactory {
         if (loggerFactory.containsKey(loggerKey)) {
             return loggerFactory.get(loggerKey);
         } else {
-            final PiLogger piLogger = new PiLogger(loggerClass, logConfig);
+            final PiLogger piLogger = new PiLogger(loggerClass, getLogConfig());
             loggerFactory.put(loggerKey, piLogger);
 
             return piLogger;

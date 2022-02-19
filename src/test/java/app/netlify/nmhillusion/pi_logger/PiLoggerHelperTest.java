@@ -7,10 +7,11 @@ import org.junit.jupiter.api.Test;
 import java.sql.SQLException;
 
 class PiLoggerHelperTest {
+    private static final PiLogger logger = PiLoggerFactory.getLog(PiLoggerHelperTest.class);
 
     @BeforeAll
     static void init() {
-        PiLoggerFactory.getLogConfig()
+        logger.getLogConfig()
                 .setColoring(true)
                 .setDisplayLineNumber(true)
                 .setTimestampPattern("yyyy-MM-dd HH:mm:ss.SSS")
@@ -20,65 +21,65 @@ class PiLoggerHelperTest {
 
     @Test
     void testTrace() {
-        PiLoggerFactory.getLogConfig()
+        logger.getLogConfig()
                 .setLogLevel(LogLevel.TRACE);
 
-        PiLoggerFactory.getLog(this).trace("do test trace message");
+        logger.trace("do test trace message");
 
-        PiLoggerFactory.getLogConfig()
+        logger.getLogConfig()
                 .setLogLevel(LogLevel.INFO);
 
-        PiLoggerFactory.getLog(this).trace("will not log this message");
+        logger.trace("will not log this message");
     }
 
     @Test
     void testDebug() {
-        PiLoggerFactory.getLogConfig()
+        logger.getLogConfig()
                 .setLogLevel(LogLevel.DEBUG);
 
-        PiLoggerFactory.getLog(this).debug("do test debug message");
+        logger.debug("do test debug message");
 
-        PiLoggerFactory.getLogConfig()
+        logger.getLogConfig()
                 .setLogLevel(LogLevel.INFO);
 
-        PiLoggerFactory.getLog(this).debug("will not log this message");
+        logger.debug("will not log this message");
     }
 
     @Test
     void testInfo() {
-        PiLoggerFactory.getLogConfig()
+        logger.getLogConfig()
                 .setLogLevel(LogLevel.INFO);
 
-        PiLoggerFactory.getLog(this).info("do test info message");
+        logger.info("do test info message");
 
-        PiLoggerFactory.getLogConfig()
+        logger.getLogConfig()
                 .setLogLevel(LogLevel.WARN);
 
-        PiLoggerFactory.getLog(this).info("will not log this message");
+        logger.info("will not log this message");
     }
 
     @Test
     void testWarn() {
-        PiLoggerFactory.getLogConfig()
+        logger.getLogConfig()
                 .setLogLevel(LogLevel.WARN);
 
-        PiLoggerFactory.getLog(this).warn("do test warn message");
+        logger.warn("do test warn message");
 
-        PiLoggerFactory.getLogConfig()
+        logger.getLogConfig()
                 .setLogLevel(LogLevel.ERROR);
 
-        PiLoggerFactory.getLog(this).warn("will not log this message");
+        logger.warn("will not log this message");
     }
 
     @Test
     void testError() {
-        PiLoggerFactory.getLogConfig()
+        logger.getLogConfig()
                 .setLogLevel(LogLevel.INFO);
 
-        PiLoggerFactory.getLog(this).error("do test error message with exception: ", new SQLException("Random Fatal Error"));
+        logger.error("do test error message with exception: ", new SQLException("Random Fatal Error"));
 
-        PiLoggerFactory.getLogConfig()
+        logger.getLogConfig()
                 .setLogLevel(LogLevel.ERROR);
-        PiLoggerFactory.getLog(this).error("do test error message");
+        logger.error("do test error message");
     }
 }

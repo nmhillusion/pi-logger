@@ -36,30 +36,37 @@ public class PiLogger {
     private static final ConsoleOutputWriter consoleOutputWriter = new ConsoleOutputWriter();
     private static final FileOutputWriter fileOutputWriter = new FileOutputWriter();
 
-    private final LogConfigModel logConfig;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat();
     private final Class<?> loggerClass;
     private final AtomicReference<String> TEMPLATE_REF = new AtomicReference<>();
     private final List<IOutputWriter> logOutputWriters = new ArrayList<>();
+    private LogConfigModel logConfig;
 
     protected PiLogger(Class<?> loggerClass, LogConfigModel logConfig) {
         this.loggerClass = loggerClass;
         setLogConfig(logConfig);
     }
-    
-    public PiLogger setLogConfig(LogConfigModel newConfig){
-        this.logConfig = logConfig;
-        dateFormat.applyPattern(newConfig.getTimestampPattern());
 
-        TEMPLATE_REF.set(logConfig.getColoring() ? COLOR_TEMPLATE : NORMAL_TEMPLATE);
+    public LogConfigModel getLogConfig() {
+        return logConfig;
+    }
 
-        logOutputWriters.add(consoleOutputWriter);
-        if (logConfig.getOutputToFile()) {
-            fileOutputWriter.setOutputLogFile(logConfig.getLogFilePath());
-            logOutputWriters.add(fileOutputWriter);
+    public PiLogger setLogConfig(LogConfigModel newConfig) {
+        if (null != newConfig) {
+            this.logConfig = newConfig;
+            dateFormat.applyPattern(newConfig.getTimestampPattern());
+
+            TEMPLATE_REF.set(logConfig.getColoring() ? COLOR_TEMPLATE : NORMAL_TEMPLATE);
+
+            logOutputWriters.add(consoleOutputWriter);
+            if (logConfig.getOutputToFile()) {
+                fileOutputWriter.setOutputLogFile(logConfig.getLogFilePath());
+                logOutputWriters.add(fileOutputWriter);
+            }
+
+            this.logConfig.setOnChangeConfig(this::registerOnChangeConfig);
         }
-
-        this.logConfig.setOnChangeConfig(this::registerOnChangeConfig);
+        return this;
     }
 
     private void registerOnChangeConfig(LogConfigModel newConfig) {

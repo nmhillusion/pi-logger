@@ -17,41 +17,43 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 
 public class FileLogTest {
+    private final PiLogger logger = PiLoggerFactory.getLog(this);
+
     @Test
     void testWriteFile() {
-        PiLoggerFactory.getLogConfig()
+        logger.getLogConfig()
                 .setColoring(true)
                 .setOutputToFile(true)
         ;
 
         final String message = "write log to file";
-        PiLoggerFactory.getLog(this).info(message);
+        logger.info(message);
 
-        final File logFile = new File(PiLoggerFactory.getLogConfig().getLogFilePath());
+        final File logFile = new File(logger.getLogConfig().getLogFilePath());
         try {
             final byte[] bytes = Files.readAllBytes(Paths.get(logFile.toURI()));
             assertTrue(new String(bytes).contains(message), "Contains message in log file.");
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e);
         }
     }
 
     @Test
     void testNoWriteFile() {
-        PiLoggerFactory.getLogConfig()
+        logger.getLogConfig()
                 .setColoring(true)
                 .setOutputToFile(false)
         ;
 
         final String message = "don't write log to file";
-        PiLoggerFactory.getLog(this).info(message);
+        logger.info(message);
 
-        final File logFile = new File(PiLoggerFactory.getLogConfig().getLogFilePath());
+        final File logFile = new File(logger.getLogConfig().getLogFilePath());
         try {
             final byte[] bytes = Files.readAllBytes(Paths.get(logFile.toURI()));
             assertFalse(new String(bytes).contains(message), "Not contains message in log file.");
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e);
         }
     }
 }
