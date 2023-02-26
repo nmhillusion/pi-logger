@@ -97,13 +97,16 @@ public class LogConfigModel implements Serializable, Cloneable {
     }
 
     public LogConfigModel setLogFilePath(String logFilePath) {
-        final Map<String, String> environments = System.getenv();
-        for (String envKey : environments.keySet()) {
-            logFilePath = logFilePath
-                    .replace("%" + envKey.toLowerCase() + "%", environments.get(envKey))
-                    .replace("%" + envKey.toUpperCase() + "%", environments.get(envKey));
-        }
+        if (null != logFilePath) {
+            final Map<String, String> environments = System.getenv();
+            for (String envKey : environments.keySet()) {
+                logFilePath = logFilePath
+                        .replace("%" + envKey.toLowerCase() + "%", environments.get(envKey))
+                        .replace("%" + envKey.toUpperCase() + "%", environments.get(envKey));
+            }
 
+        }
+        
         this.logFilePath = logFilePath;
         triggerOnChangeConfig();
         return this;
