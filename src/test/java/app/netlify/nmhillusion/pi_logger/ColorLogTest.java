@@ -9,27 +9,28 @@ import org.junit.jupiter.api.Test;
  */
 
 public class ColorLogTest {
+    private final PiLogger logger = PiLoggerFactory.getLog(this);
 
     @Test
     void testColoring() {
-        PiLoggerFactory.getLogConfig()
+        logger.getLogConfig()
                 .setColoring(true)
         ;
 
-        PiLoggerFactory.getLog(this).info("log with color");
+        logger.info("log with color");
 
-        PiLoggerFactory.getLogConfig()
+        logger.getLogConfig()
                 .setColoring(false)
         ;
     }
 
     @Test
     void testWithoutColoring() {
-        PiLoggerFactory.getLogConfig()
+        logger.getLogConfig()
                 .setColoring(false)
         ;
 
-        PiLoggerFactory.getLog(this).info("log without color");
+        logger.info("log without color");
     }
 
 }

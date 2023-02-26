@@ -1,8 +1,6 @@
-# pi-logger
+#  PiLogger
 
-PiLogger
-
-- a simple logger by Java
+> a simple logger by Java
 
 ---
 
@@ -18,15 +16,15 @@ PiLoggerHelper.getLog(this).info("hello, logger!!!");
 
 ## Level of logger
 
-- PiLogger have 5 level of logging with increasing priority.
+PiLogger have 5 levels of logging with increasing priority.
 
-| priority | level name | example of usage |
-| -------- | ---------- | ---------------- |
-| 0        | `TRACE`    | logger.trace()   |
-| 1        | `DEBUG`    | logger.debug()   |
-| 2        | `INFO`     | logger.info()    |
-| 3        | `WARN`     | logger.warn()    |
-| 4        | `ERROR`    | logger.error()   |
+| priority | level name | example of usage              |
+| -------- | ---------- | ----------------------------- |
+| 0        | `TRACE`    | logger.trace("trace message") |
+| 1        | `DEBUG`    | logger.debug("debug message") |
+| 2        | `INFO`     | logger.info("info message")   |
+| 3        | `WARN`     | logger.warn("warn message")   |
+| 4        | `ERROR`    | logger.error("error message") |
 
 ## Config of logger
 

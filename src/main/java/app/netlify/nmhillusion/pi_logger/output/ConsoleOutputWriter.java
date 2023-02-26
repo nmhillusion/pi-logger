@@ -2,6 +2,7 @@ package app.netlify.nmhillusion.pi_logger.output;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.List;
 
 /**
  * date: 2022-02-12
@@ -18,11 +19,13 @@ public class ConsoleOutputWriter extends IOutputWriter {
     }
 
     @Override
-    public void doOutput(String outputMessage, Throwable throwable) throws IOException {
-        super.doOutput(outputMessage, throwable);
+    public void doOutput(String outputMessage, List<Throwable> throwableList) throws IOException {
+        super.doOutput(outputMessage, throwableList);
 
-        if (null != throwable) {
-            throwable.printStackTrace();
+        if (null != throwableList) {
+            for (final Throwable throwable_ : throwableList) {
+                throwable_.printStackTrace();
+            }
         }
     }
 }

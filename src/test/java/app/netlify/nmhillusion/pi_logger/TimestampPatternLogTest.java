@@ -9,38 +9,39 @@ import org.junit.jupiter.api.Test;
  */
 
 public class TimestampPatternLogTest {
+    private final PiLogger logger = PiLoggerFactory.getLog(this);
 
     @Test
     void testTimestampPattern1() {
         final String timestampPattern = "dd-MM-yyyy";
 
-        PiLoggerFactory.getLogConfig()
+        logger.getLogConfig()
                 .setColoring(true)
                 .setTimestampPattern(timestampPattern);
 
-        PiLoggerFactory.getLog(this).info(timestampPattern);
+        logger.info(timestampPattern);
     }
 
     @Test
     void testTimestampPattern2() {
         final String timestampPattern = "yyyy/MMM/dd HH:mm:ss";
 
-        PiLoggerFactory.getLogConfig()
+        logger.getLogConfig()
                 .setColoring(true)
                 .setTimestampPattern(timestampPattern);
 
-        PiLoggerFactory.getLog(this).info(timestampPattern);
+        logger.info(timestampPattern);
     }
 
     @Test
     void testTimestampPattern3() {
         final String timestampPattern = "HH:mm:ss.SSSXXX";
 
-        PiLoggerFactory.getLogConfig()
+        logger.getLogConfig()
                 .setColoring(true)
                 .setTimestampPattern(timestampPattern);
 
-        PiLoggerFactory.getLog(this).info(timestampPattern);
+        logger.info(timestampPattern);
     }
 
 }
