@@ -64,6 +64,7 @@ public class PiLogger implements org.slf4j.Logger {
 
             TEMPLATE_REF.set(logConfig.getColoring() ? COLOR_TEMPLATE : NORMAL_TEMPLATE);
 
+            logOutputWriters.clear();
             logOutputWriters.add(consoleOutputWriter);
             if (logConfig.getOutputToFile()) {
                 fileOutputWriter.setOutputLogFile(logConfig.getLogFilePath());
