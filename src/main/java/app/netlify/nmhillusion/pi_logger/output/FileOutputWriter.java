@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.List;
 
 /**
  * date: 2022-02-12
@@ -56,13 +57,15 @@ public class FileOutputWriter extends IOutputWriter {
     }
 
     @Override
-    public void doOutput(String outputMessage, Throwable throwable) throws IOException {
+    public void doOutput(String outputMessage, List<Throwable> throwableList) throws IOException {
         outputMessage = removeColorCharsInMessage(outputMessage);
 
-        super.doOutput(outputMessage, throwable);
+        super.doOutput(outputMessage, throwableList);
 
-        if (null != fileOutputStream && null != throwable) {
-            throwable.printStackTrace(printStream);
+        if (null != fileOutputStream && null != throwableList) {
+            for (final Throwable throwable_ : throwableList) {
+                throwable_.printStackTrace(printStream);
+            }
         }
     }
 }
