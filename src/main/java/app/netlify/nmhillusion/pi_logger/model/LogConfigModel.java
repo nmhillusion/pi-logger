@@ -1,7 +1,7 @@
 package app.netlify.nmhillusion.pi_logger.model;
 
-import app.netlify.nmhillusion.pi_logger.listener.OnChangeConfig;
 import app.netlify.nmhillusion.pi_logger.constant.LogLevel;
+import app.netlify.nmhillusion.pi_logger.listener.OnChangeConfig;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -12,7 +12,7 @@ import java.util.Map;
  * created-by: nmhillusion
  */
 
-public class LogConfigModel implements Serializable {
+public class LogConfigModel implements Serializable, Cloneable {
     private boolean coloring;
     private String timestampPattern;
     private boolean displayLineNumber;
@@ -61,15 +61,15 @@ public class LogConfigModel implements Serializable {
 
         return this;
     }
-    
-    public LogLevel getLogLevel(){
+
+    public LogLevel getLogLevel() {
         return logLevel;
     }
-    
-    public LogConfigModel setLogLevel(LogLevel logLevel){
+
+    public LogConfigModel setLogLevel(LogLevel logLevel) {
         this.logLevel = logLevel;
         triggerOnChangeConfig();
-        return this;   
+        return this;
     }
 
     public OnChangeConfig getOnChangeConfig() {
@@ -107,5 +107,23 @@ public class LogConfigModel implements Serializable {
         this.logFilePath = logFilePath;
         triggerOnChangeConfig();
         return this;
+    }
+
+    @Override
+    public LogConfigModel clone() {
+        try {
+            final LogConfigModel clone = (LogConfigModel) super.clone();
+            clone.setColoring(coloring)
+                    .setDisplayLineNumber(displayLineNumber)
+                    .setLogFilePath(logFilePath)
+                    .setLogLevel(logLevel)
+                    .setOnChangeConfig(onChangeConfig)
+                    .setOutputToFile(outputToFile)
+                    .setTimestampPattern(timestampPattern)
+            ;
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }
