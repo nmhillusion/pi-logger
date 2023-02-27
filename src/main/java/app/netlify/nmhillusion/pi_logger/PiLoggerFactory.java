@@ -25,15 +25,8 @@ public class PiLoggerFactory {
             .setOutputToFile(false)
             .setLogLevel(LogLevel.INFO);
 
-    public static void setDefaultLogConfig(LogConfigModel logConfigModel) {
-        defaultLogConfig.setColoring(logConfigModel.getColoring())
-                .setDisplayLineNumber(logConfigModel.getDisplayLineNumber())
-                .setLogFilePath(logConfigModel.getLogFilePath())
-                .setLogLevel(logConfigModel.getLogLevel())
-                .setOnChangeConfig(logConfigModel.getOnChangeConfig())
-                .setOutputToFile(logConfigModel.getOutputToFile())
-                .setTimestampPattern(logConfigModel.getTimestampPattern())
-        ;
+    public static LogConfigModel getDefaultLogConfig() {
+        return defaultLogConfig;
     }
 
     public static LogConfigModel getLogConfig() {
