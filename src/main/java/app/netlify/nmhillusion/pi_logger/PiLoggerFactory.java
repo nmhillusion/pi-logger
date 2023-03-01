@@ -22,7 +22,7 @@ public class PiLoggerFactory {
             .setDisplayLineNumber(true)
             .setTimestampPattern(DEFAULT_DATE_PATTERN)
             .setLogFilePath(DEFAULT_LOG_FILE_PATH)
-            .setOutputToFile(false)
+            .setIsOutputToFile(false)
             .setLogLevel(LogLevel.INFO);
 
     public static LogConfigModel getDefaultLogConfig() {

@@ -23,7 +23,7 @@ public class FileLogTest {
     void testWriteFile() {
         logger.getLogConfig()
                 .setColoring(true)
-                .setOutputToFile(true)
+                .setIsOutputToFile(true)
         ;
 
         final String message = "write log to file";
@@ -42,7 +42,7 @@ public class FileLogTest {
     void testNoWriteFile() {
         logger.getLogConfig()
                 .setColoring(true)
-                .setOutputToFile(false)
+                .setIsOutputToFile(false)
         ;
 
         final String message = "don't write log to file";

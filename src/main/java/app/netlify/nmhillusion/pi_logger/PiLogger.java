@@ -66,7 +66,7 @@ public class PiLogger implements org.slf4j.Logger {
 
             logOutputWriters.clear();
             logOutputWriters.add(consoleOutputWriter);
-            if (logConfig.getOutputToFile()) {
+            if (logConfig.isOutputToFile()) {
                 fileOutputWriter.setOutputLogFile(logConfig.getLogFilePath());
                 logOutputWriters.add(fileOutputWriter);
             }
@@ -80,7 +80,7 @@ public class PiLogger implements org.slf4j.Logger {
         dateFormat.applyPattern(newConfig.getTimestampPattern());
         TEMPLATE_REF.set(newConfig.getColoring() ? COLOR_TEMPLATE : NORMAL_TEMPLATE);
 
-        if (logConfig.getOutputToFile()) {
+        if (logConfig.isOutputToFile()) {
             fileOutputWriter.setOutputLogFile(logConfig.getLogFilePath());
 
             if (!logOutputWriters.contains(fileOutputWriter)) {

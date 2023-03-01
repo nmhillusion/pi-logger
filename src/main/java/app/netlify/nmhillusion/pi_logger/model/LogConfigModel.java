@@ -18,7 +18,7 @@ public class LogConfigModel implements Serializable, Cloneable {
     private boolean displayLineNumber;
     private LogLevel logLevel;
 
-    private boolean outputToFile = false;
+    private boolean isOutputToFile = false;
     private String logFilePath;
 
     private OnChangeConfig onChangeConfig;
@@ -82,12 +82,12 @@ public class LogConfigModel implements Serializable, Cloneable {
         return this;
     }
 
-    public boolean getOutputToFile() {
-        return outputToFile;
+    public boolean isOutputToFile() {
+        return isOutputToFile;
     }
 
-    public LogConfigModel setOutputToFile(boolean outputToFile) {
-        this.outputToFile = outputToFile;
+    public LogConfigModel setIsOutputToFile(boolean outputToFile) {
+        this.isOutputToFile = outputToFile;
         triggerOnChangeConfig();
         return this;
     }
@@ -106,7 +106,7 @@ public class LogConfigModel implements Serializable, Cloneable {
             }
 
         }
-        
+
         this.logFilePath = logFilePath;
         triggerOnChangeConfig();
         return this;
@@ -121,7 +121,7 @@ public class LogConfigModel implements Serializable, Cloneable {
                     .setLogFilePath(logFilePath)
                     .setLogLevel(logLevel)
                     .setOnChangeConfig(onChangeConfig)
-                    .setOutputToFile(outputToFile)
+                    .setIsOutputToFile(isOutputToFile)
                     .setTimestampPattern(timestampPattern)
             ;
             return clone;
