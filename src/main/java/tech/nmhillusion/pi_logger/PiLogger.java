@@ -1,12 +1,12 @@
-package app.netlify.nmhillusion.pi_logger;
+package tech.nmhillusion.pi_logger;
 
-import app.netlify.nmhillusion.pi_logger.constant.AnsiColor;
-import app.netlify.nmhillusion.pi_logger.constant.LogLevel;
-import app.netlify.nmhillusion.pi_logger.constant.StringConstant;
-import app.netlify.nmhillusion.pi_logger.model.LogConfigModel;
-import app.netlify.nmhillusion.pi_logger.output.ConsoleOutputWriter;
-import app.netlify.nmhillusion.pi_logger.output.FileOutputWriter;
-import app.netlify.nmhillusion.pi_logger.output.IOutputWriter;
+import tech.nmhillusion.pi_logger.constant.AnsiColor;
+import tech.nmhillusion.pi_logger.constant.LogLevel;
+import tech.nmhillusion.pi_logger.constant.StringConstant;
+import tech.nmhillusion.pi_logger.model.LogConfigModel;
+import tech.nmhillusion.pi_logger.output.ConsoleOutputWriter;
+import tech.nmhillusion.pi_logger.output.FileOutputWriter;
+import tech.nmhillusion.pi_logger.output.IOutputWriter;
 import org.slf4j.Marker;
 
 import java.io.IOException;

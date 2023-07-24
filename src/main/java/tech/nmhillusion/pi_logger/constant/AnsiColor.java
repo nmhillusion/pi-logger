@@ -1,4 +1,4 @@
-package app.netlify.nmhillusion.pi_logger.constant;
+package tech.nmhillusion.pi_logger.constant;
 
 /**
  * date: 2022-02-11

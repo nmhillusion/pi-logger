@@ -1,7 +1,7 @@
-package app.netlify.nmhillusion.pi_logger.output;
+package tech.nmhillusion.pi_logger.output;
 
-import app.netlify.nmhillusion.pi_logger.constant.AnsiColor;
-import app.netlify.nmhillusion.pi_logger.constant.StringConstant;
+import tech.nmhillusion.pi_logger.constant.AnsiColor;
+import tech.nmhillusion.pi_logger.constant.StringConstant;
 
 import java.io.File;
 import java.io.FileOutputStream;

@@ -1,4 +1,4 @@
-package app.netlify.nmhillusion.pi_logger.output;
+package tech.nmhillusion.pi_logger.output;
 
 import java.io.IOException;
 import java.io.PrintStream;

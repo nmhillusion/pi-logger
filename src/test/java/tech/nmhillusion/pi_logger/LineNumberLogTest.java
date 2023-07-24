@@ -1,4 +1,4 @@
-package app.netlify.nmhillusion.pi_logger;
+package tech.nmhillusion.pi_logger;
 
 import org.junit.jupiter.api.Test;
 

@@ -1,12 +1,7 @@
-package app.netlify.nmhillusion.pi_logger;
+package tech.nmhillusion.pi_logger;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
-
-import app.netlify.nmhillusion.pi_logger.model.LogConfigModel;
-import app.netlify.nmhillusion.pi_logger.PiLoggerFactory;
-import app.netlify.nmhillusion.pi_logger.PiLogger;
-import app.netlify.nmhillusion.pi_logger.constant.LogLevel;
 
 /**
  * date: 2023-02-27

@@ -1,6 +1,6 @@
-package app.netlify.nmhillusion.pi_logger;
+package tech.nmhillusion.pi_logger;
 
-import app.netlify.nmhillusion.pi_logger.constant.LogLevel;
+import tech.nmhillusion.pi_logger.constant.LogLevel;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

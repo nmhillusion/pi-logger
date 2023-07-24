@@ -1,7 +1,7 @@
-package app.netlify.nmhillusion.pi_logger.model;
+package tech.nmhillusion.pi_logger.model;
 
-import app.netlify.nmhillusion.pi_logger.constant.LogLevel;
-import app.netlify.nmhillusion.pi_logger.listener.OnChangeConfig;
+import tech.nmhillusion.pi_logger.constant.LogLevel;
+import tech.nmhillusion.pi_logger.listener.OnChangeConfig;
 
 import java.io.Serializable;
 import java.util.Map;

@@ -1,6 +1,6 @@
-package app.netlify.nmhillusion.pi_logger.listener;
+package tech.nmhillusion.pi_logger.listener;
 
-import app.netlify.nmhillusion.pi_logger.model.LogConfigModel;
+import tech.nmhillusion.pi_logger.model.LogConfigModel;
 
 /**
  * date: 2022-02-12
