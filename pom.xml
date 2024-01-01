@@ -16,8 +16,8 @@
         <encoding.charset>UTF-8</encoding.charset>
         <project.build.sourceEncoding>${encoding.charset}</project.build.sourceEncoding>
 
-        <slf4j.version>2.0.4</slf4j.version>
-        <junit.version>5.9.2</junit.version>
+        <slf4j.version>2.0.5</slf4j.version>
+        <junit.version>5.10.1</junit.version>
     </properties>
 
     <dependencies>
