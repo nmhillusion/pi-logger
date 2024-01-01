@@ -39,6 +39,8 @@ public class PiLogger implements org.slf4j.Logger {
                     " -- " +
                     "[$THREAD_NAME]" +
                     " -- " +
+                    "[$PID]" +
+                    " -- " +
                     AnsiColor.ANSI_PURPLE + "$LOG_NAME.$METHOD_NAME()" + AnsiColor.ANSI_RESET +
                     "$LINE_NUMBER : $LOG_MESSAGE";
     private static final ConsoleOutputWriter consoleOutputWriter = new ConsoleOutputWriter();
@@ -140,6 +142,7 @@ public class PiLogger implements org.slf4j.Logger {
                     .replace("$TIMESTAMP", dateFormat.format(Calendar.getInstance().getTime()))
                     .replace("$LOG_LEVEL", logLevel.getValue())
                     .replace("$THREAD_NAME", Thread.currentThread().getName())
+                    .replace("$PID", String.valueOf(ProcessHandle.current().pid()))
                     .replace("$LOG_NAME", loggerClass.getName())
                     .replace("$METHOD_NAME", logStackTraceElement != null ? logStackTraceElement.getMethodName() : StringConstant.EMPTY)
                     .replace("$LOG_MESSAGE", buildLogMessage(messageFormat, args));
