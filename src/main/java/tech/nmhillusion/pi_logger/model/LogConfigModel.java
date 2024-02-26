@@ -15,7 +15,6 @@ import java.util.Map;
 public class LogConfigModel implements Serializable, Cloneable {
     private boolean coloring;
     private String timestampPattern;
-    private boolean displayLineNumber;
     private LogLevel logLevel;
 
     private boolean isOutputToFile = false;
@@ -46,17 +45,6 @@ public class LogConfigModel implements Serializable, Cloneable {
 
     public LogConfigModel setTimestampPattern(String timestampPattern) {
         this.timestampPattern = timestampPattern;
-        triggerOnChangeConfig();
-
-        return this;
-    }
-
-    public boolean getDisplayLineNumber() {
-        return displayLineNumber;
-    }
-
-    public LogConfigModel setDisplayLineNumber(boolean displayLineNumber) {
-        this.displayLineNumber = displayLineNumber;
         triggerOnChangeConfig();
 
         return this;
@@ -117,7 +105,6 @@ public class LogConfigModel implements Serializable, Cloneable {
         try {
             final LogConfigModel clone = (LogConfigModel) super.clone();
             clone.setColoring(coloring)
-                    .setDisplayLineNumber(displayLineNumber)
                     .setLogFilePath(logFilePath)
                     .setLogLevel(logLevel)
                     .setOnChangeConfig(onChangeConfig)

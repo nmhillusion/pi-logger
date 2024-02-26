@@ -30,32 +30,37 @@ import java.util.stream.Stream;
 
 public class PiLogger implements org.slf4j.Logger {
     private final static ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor();
-    private static final String NORMAL_TEMPLATE =
-            "$TIMESTAMP -- [$LOG_LEVEL] -- [$THREAD_NAME] -- $LOG_NAME.$METHOD_NAME()$LINE_NUMBER : $LOG_MESSAGE";
-    private static final String COLOR_TEMPLATE =
-            AnsiColor.ANSI_CYAN + "$TIMESTAMP" + AnsiColor.ANSI_RESET +
-                    " -- " +
-                    "$ANSI_COLOR[$LOG_LEVEL]" + AnsiColor.ANSI_RESET +
-                    " -- " +
-                    "[$THREAD_NAME]" +
-                    " -- " +
-                    "[$PID]" +
-                    " -- " +
-                    AnsiColor.ANSI_PURPLE + "$LOG_NAME.$METHOD_NAME()" + AnsiColor.ANSI_RESET +
-                    "$LINE_NUMBER : $LOG_MESSAGE";
+    private static final String NORMAL_TEMPLATE = getColorTemplate(false);
+    private static final String COLOR_TEMPLATE = getColorTemplate(true);
     private static final ConsoleOutputWriter consoleOutputWriter = new ConsoleOutputWriter();
     private static final FileOutputWriter fileOutputWriter = new FileOutputWriter();
     private static final Pattern HAS_STRING_FORMAT_PATTERN = Pattern.compile("%[a-z]", Pattern.CASE_INSENSITIVE);
-
     private final SimpleDateFormat dateFormat = new SimpleDateFormat();
     private final Class<?> loggerClass;
-    private final AtomicReference<String> TEMPLATE_REF = new AtomicReference<>();
     private final List<IOutputWriter> logOutputWriters = new ArrayList<>();
+    private final AtomicReference<String> TEMPLATE_REF = new AtomicReference<>();
     private LogConfigModel logConfig;
 
     protected PiLogger(Class<?> loggerClass, LogConfigModel logConfig) {
         this.loggerClass = loggerClass;
         setLogConfig(logConfig);
+    }
+
+    private static String getColorTemplate(boolean isColoring) {
+        return placeholderAnsiCode(isColoring, AnsiColor.ANSI_CYAN) + "$TIMESTAMP" + placeholderAnsiCode(isColoring, AnsiColor.ANSI_RESET) +
+                " -- " +
+                placeholderAnsiCode(isColoring, "$ANSI_COLOR") + "[$LOG_LEVEL]" + placeholderAnsiCode(isColoring, AnsiColor.ANSI_RESET) +
+                " -- " +
+                "[$THREAD_NAME]" +
+                " -- " +
+                "[$PID]" +
+                " -- " +
+                placeholderAnsiCode(isColoring, AnsiColor.ANSI_PURPLE) + "$LOG_NAME" + placeholderAnsiCode(isColoring, AnsiColor.ANSI_RESET) +
+                " : $LOG_MESSAGE";
+    }
+
+    private static String placeholderAnsiCode(boolean isColoring, String replacementAnsiCode) {
+        return isColoring ? replacementAnsiCode : StringConstant.EMPTY;
     }
 
     public LogConfigModel getLogConfig() {
@@ -81,7 +86,7 @@ public class PiLogger implements org.slf4j.Logger {
         return this;
     }
 
-    private void registerOnChangeConfig(LogConfigModel newConfig) {
+    private synchronized void registerOnChangeConfig(LogConfigModel newConfig) {
         dateFormat.applyPattern(newConfig.getTimestampPattern());
         TEMPLATE_REF.set(newConfig.getColoring() ? COLOR_TEMPLATE : NORMAL_TEMPLATE);
 
@@ -102,37 +107,18 @@ public class PiLogger implements org.slf4j.Logger {
         }
     }
 
-    private StackTraceElement getLogStackTraceElement() {
-        final StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-        StackTraceElement logStackTraceElement = null;
-
-        if (0 < stackTrace.length) {
-            logStackTraceElement = stackTrace[0];
-        }
-
-        for (StackTraceElement stackTraceElement : stackTrace) {
-            if (stackTraceElement.getClassName().equals(loggerClass.getName())) {
-                logStackTraceElement = stackTraceElement;
-                break;
-            }
-        }
-        return logStackTraceElement;
-    }
-
     private void doLog(LogLevel logLevel, String messageFormat, Object... args) {
         EXECUTOR_SERVICE.execute(() -> {
             doLogOnThread(logLevel, messageFormat, args);
         });
     }
 
-    private void doLogOnThread(LogLevel logLevel, String messageFormat, Object... args) {
+    private synchronized void doLogOnThread(LogLevel logLevel, String messageFormat, Object... args) {
         if (logLevel.getPriority() < this.logConfig.getLogLevel().getPriority()) {
             return; // not log this because user don't want to write log in this log level
         }
 
         try {
-            final StackTraceElement logStackTraceElement = getLogStackTraceElement();
-
             List<Throwable> throwableFromArgs = Arrays.stream(args)
                     .filter(Throwable.class::isInstance)
                     .map(Throwable.class::cast)
@@ -144,22 +130,11 @@ public class PiLogger implements org.slf4j.Logger {
                     .replace("$THREAD_NAME", Thread.currentThread().getName())
                     .replace("$PID", String.valueOf(ProcessHandle.current().pid()))
                     .replace("$LOG_NAME", loggerClass.getName())
-                    .replace("$METHOD_NAME", logStackTraceElement != null ? logStackTraceElement.getMethodName() : StringConstant.EMPTY)
                     .replace("$LOG_MESSAGE", buildLogMessage(messageFormat, args));
 
             if (logConfig.getColoring()) {
                 finalLogMessage = finalLogMessage
                         .replace("$ANSI_COLOR", logLevel.getColor());
-            }
-
-            if (logConfig.getDisplayLineNumber()) {
-                finalLogMessage = finalLogMessage
-                        .replace("$LINE_NUMBER",
-                                ":" + (logStackTraceElement != null ?
-                                        logStackTraceElement.getLineNumber() : 0));
-            } else {
-                finalLogMessage = finalLogMessage
-                        .replace("$LINE_NUMBER", StringConstant.EMPTY);
             }
 
             doWriteToOutputs(finalLogMessage, throwableFromArgs);

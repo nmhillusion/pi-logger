@@ -19,7 +19,6 @@ public class PiLoggerFactory {
 
     private static final LogConfigModel defaultLogConfig = new LogConfigModel()
             .setColoring(false)
-            .setDisplayLineNumber(true)
             .setTimestampPattern(DEFAULT_DATE_PATTERN)
             .setLogFilePath(DEFAULT_LOG_FILE_PATH)
             .setIsOutputToFile(false)

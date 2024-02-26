@@ -1,8 +1,8 @@
 package tech.nmhillusion.pi_logger;
 
-import tech.nmhillusion.pi_logger.constant.LogLevel;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import tech.nmhillusion.pi_logger.constant.LogLevel;
 
 import java.sql.SQLException;
 
@@ -13,7 +13,6 @@ class PiLoggerHelperTest {
     static void init() {
         logger.getLogConfig()
                 .setColoring(true)
-                .setDisplayLineNumber(true)
                 .setTimestampPattern("yyyy-MM-dd HH:mm:ss.SSS")
                 .setLogLevel(LogLevel.ERROR)
         ;

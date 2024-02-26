@@ -18,10 +18,6 @@ public class ColorLogTest {
         ;
 
         logger.info("log with color");
-
-        logger.getLogConfig()
-                .setColoring(false)
-        ;
     }
 
     @Test
