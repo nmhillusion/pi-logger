@@ -108,12 +108,13 @@ public class PiLogger implements org.slf4j.Logger {
     }
 
     private void doLog(LogLevel logLevel, String messageFormat, Object... args) {
+        final Thread currentThread = Thread.currentThread();
         EXECUTOR_SERVICE.execute(() -> {
-            doLogOnThread(logLevel, messageFormat, args);
+            doLogOnThread(currentThread, logLevel, messageFormat, args);
         });
     }
 
-    private synchronized void doLogOnThread(LogLevel logLevel, String messageFormat, Object... args) {
+    private synchronized void doLogOnThread(Thread currentThread, LogLevel logLevel, String messageFormat, Object... args) {
         if (logLevel.getPriority() < this.logConfig.getLogLevel().getPriority()) {
             return; // not log this because user don't want to write log in this log level
         }
@@ -127,7 +128,7 @@ public class PiLogger implements org.slf4j.Logger {
             String finalLogMessage = TEMPLATE_REF.get()
                     .replace("$TIMESTAMP", dateFormat.format(Calendar.getInstance().getTime()))
                     .replace("$LOG_LEVEL", logLevel.getValue())
-                    .replace("$THREAD_NAME", Thread.currentThread().getName())
+                    .replace("$THREAD_NAME", currentThread.getName())
                     .replace("$PID", String.valueOf(ProcessHandle.current().pid()))
                     .replace("$LOG_NAME", loggerClass.getName())
                     .replace("$LOG_MESSAGE", buildLogMessage(messageFormat, args));
