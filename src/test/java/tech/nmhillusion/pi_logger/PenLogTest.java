@@ -61,7 +61,7 @@ public class PenLogTest {
                 .setIsOutputToFile(true)
         ;
 
-        final String message = "test pen log with multi thread[%s] %d";
+        final String message = "test pen log with executor service[%s] %d";
 
         for (int i = 0; i < 10; i++) {
             final int threadIndex = i;

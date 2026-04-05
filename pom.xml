@@ -16,9 +16,9 @@
         <encoding.charset>UTF-8</encoding.charset>
         <project.build.sourceEncoding>${encoding.charset}</project.build.sourceEncoding>
 
-<!--        https://mvnrepository.com/artifact/org.slf4j/slf4j-api-->
+        <!--        https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
         <slf4j.version>2.0.17</slf4j.version>
-<!--        https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-->
+        <!--        https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
         <junit.version>6.0.3</junit.version>
     </properties>
 
@@ -31,15 +31,8 @@
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
+            <artifactId>junit-jupiter-api</artifactId>
             <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-commons</artifactId>
-            <version>${junit.version}</version> <!-- Use the version matching your junit-jupiter -->
             <scope>test</scope>
         </dependency>
     </dependencies>
