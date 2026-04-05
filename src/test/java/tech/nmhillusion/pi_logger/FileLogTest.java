@@ -32,8 +32,11 @@ public class FileLogTest {
         final File logFile = new File(logger.getLogConfig().getLogFilePath());
         try {
             final byte[] bytes = Files.readAllBytes(Paths.get(logFile.toURI()));
+
+            Thread.sleep(3_000);
+
             assertTrue(new String(bytes).contains(message), "Contains message in log file.");
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error(e);
         }
     }

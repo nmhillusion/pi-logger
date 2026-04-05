@@ -29,7 +29,12 @@ import java.util.stream.Stream;
  */
 
 public class PiLogger implements org.slf4j.Logger {
-    private final static ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor();
+    private final static ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor(r -> {
+        final Thread thread = new Thread(r);
+        thread.setDaemon(true);
+        thread.setName("PiLogger-Thread");
+        return thread;
+    });
     private static final String NORMAL_TEMPLATE = getColorTemplate(false);
     private static final String COLOR_TEMPLATE = getColorTemplate(true);
     private static final ConsoleOutputWriter consoleOutputWriter = new ConsoleOutputWriter();

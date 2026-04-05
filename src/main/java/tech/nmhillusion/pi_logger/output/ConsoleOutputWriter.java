@@ -10,21 +10,16 @@ import java.util.List;
  * created-by: nmhillusion
  */
 
-public class ConsoleOutputWriter extends IOutputWriter {
-    private final PrintStream printStream = new PrintStream(System.out, true);
-
-    @Override
-    protected PrintStream getOutputPrintStream() {
-        return printStream;
-    }
+public class ConsoleOutputWriter implements IOutputWriter {
 
     @Override
     public void doOutput(String outputMessage, List<Throwable> throwableList) throws IOException {
-        super.doOutput(outputMessage, throwableList);
+        final PrintStream printStream = System.out;
+        printStream.println(outputMessage);
 
         if (null != throwableList) {
             for (final Throwable throwable_ : throwableList) {
-                throwable_.printStackTrace();
+                throwable_.printStackTrace(printStream);
             }
         }
     }

@@ -15,9 +15,8 @@ import java.util.List;
  * created-by: nmhillusion
  */
 
-public class FileOutputWriter extends IOutputWriter {
-    private FileOutputStream fileOutputStream;
-    private PrintStream printStream;
+public class FileOutputWriter implements IOutputWriter {
+    private String logFilePath;
 
     public void setOutputLogFile(String logFilePath) {
         try {
@@ -30,16 +29,10 @@ public class FileOutputWriter extends IOutputWriter {
                 }
             }
 
-            fileOutputStream = new FileOutputStream(logFilePath, true);
-            printStream = new PrintStream(fileOutputStream, true);
+            this.logFilePath = logFilePath;
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-    }
-
-    @Override
-    protected PrintStream getOutputPrintStream() {
-        return printStream;
     }
 
     private String removeColorCharsInMessage(String message) {
@@ -59,12 +52,15 @@ public class FileOutputWriter extends IOutputWriter {
     @Override
     public void doOutput(String outputMessage, List<Throwable> throwableList) throws IOException {
         outputMessage = removeColorCharsInMessage(outputMessage);
+        try (final FileOutputStream fileOutputStream = new FileOutputStream(logFilePath, true);
+             final PrintStream printStream = new PrintStream(fileOutputStream, true)) {
 
-        super.doOutput(outputMessage, throwableList);
+            printStream.println(outputMessage);
 
-        if (null != fileOutputStream && null != throwableList) {
-            for (final Throwable throwable_ : throwableList) {
-                throwable_.printStackTrace(printStream);
+            if (null != throwableList) {
+                for (final Throwable throwable_ : throwableList) {
+                    throwable_.printStackTrace(printStream);
+                }
             }
         }
     }

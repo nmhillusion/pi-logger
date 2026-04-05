@@ -6,7 +6,7 @@
 
     <groupId>tech.nmhillusion</groupId>
     <artifactId>pi-logger</artifactId>
-    <version>2024.9.8</version>
+    <version>2026.1.0</version>
 
     <properties>
         <java.version>17</java.version>
@@ -16,8 +16,10 @@
         <encoding.charset>UTF-8</encoding.charset>
         <project.build.sourceEncoding>${encoding.charset}</project.build.sourceEncoding>
 
-        <slf4j.version>2.0.16</slf4j.version>
-        <junit.version>5.10.1</junit.version>
+<!--        https://mvnrepository.com/artifact/org.slf4j/slf4j-api-->
+        <slf4j.version>2.0.17</slf4j.version>
+<!--        https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-->
+        <junit.version>6.0.3</junit.version>
     </properties>
 
     <dependencies>
@@ -31,6 +33,13 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-commons</artifactId>
+            <version>${junit.version}</version> <!-- Use the version matching your junit-jupiter -->
             <scope>test</scope>
         </dependency>
     </dependencies>
