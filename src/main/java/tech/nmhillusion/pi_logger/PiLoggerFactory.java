@@ -1,5 +1,7 @@
 package tech.nmhillusion.pi_logger;
 
+import org.slf4j.ILoggerFactory;
+import org.slf4j.Logger;
 import tech.nmhillusion.pi_logger.constant.LogLevel;
 import tech.nmhillusion.pi_logger.model.LogConfigModel;
 
@@ -12,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * created-by: nmhillusion
  */
 
-public class PiLoggerFactory {
+public class PiLoggerFactory implements ILoggerFactory {
     private static final Map<String, PiLogger> loggerFactory = new ConcurrentHashMap<>();
     private static final String DEFAULT_DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS";
     private static final String DEFAULT_LOG_FILE_PATH = "output.log";
@@ -34,22 +36,20 @@ public class PiLoggerFactory {
     }
 
     public static PiLogger getLog(Object client) {
-        Class<?> loggerClass = PiLoggerFactory.class;
+        String loggerName = PiLoggerFactory.class.getName();
         if (client instanceof Class) {
-            loggerClass = (Class<?>) client;
+            loggerName = ((Class<?>) client).getName();
+        } else if (client instanceof String) {
+            loggerName = (String) client;
         } else if (null != client) {
-            loggerClass = client.getClass();
+            loggerName = client.getClass().getName();
         }
 
-        final String loggerKey = loggerClass.getName();
-        if (loggerFactory.containsKey(loggerKey)) {
-            return loggerFactory.get(loggerKey);
-        } else {
-            final PiLogger piLogger = new PiLogger(loggerClass, getLogConfig());
-            loggerFactory.put(loggerKey, piLogger);
-
-            return piLogger;
-        }
+        return new PiLoggerFactory().getLogger(loggerName);
     }
 
+    @Override
+    public PiLogger getLogger(String name) {
+        return loggerFactory.computeIfAbsent(name, key -> new PiLogger(key, getLogConfig()));
+    }
 }

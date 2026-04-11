@@ -41,13 +41,13 @@ public class PiLogger implements org.slf4j.Logger {
     private static final FileOutputWriter fileOutputWriter = new FileOutputWriter();
     private static final Pattern HAS_STRING_FORMAT_PATTERN = Pattern.compile("%[a-z]", Pattern.CASE_INSENSITIVE);
     private final SimpleDateFormat dateFormat = new SimpleDateFormat();
-    private final Class<?> loggerClass;
+    private final String loggerName;
     private final List<IOutputWriter> logOutputWriters = new ArrayList<>();
     private final AtomicReference<String> TEMPLATE_REF = new AtomicReference<>();
     private LogConfigModel logConfig;
 
-    protected PiLogger(Class<?> loggerClass, LogConfigModel logConfig) {
-        this.loggerClass = loggerClass;
+    protected PiLogger(String loggerName, LogConfigModel logConfig) {
+        this.loggerName = loggerName;
         setLogConfig(logConfig);
     }
 
@@ -154,7 +154,7 @@ public class PiLogger implements org.slf4j.Logger {
                     .replace("$LOG_LEVEL", logLevel.getValue())
                     .replace("$THREAD_NAME", currentThread.getName())
                     .replace("$PID", String.valueOf(ProcessHandle.current().pid()))
-                    .replace("$LOG_NAME", loggerClass.getName())
+                    .replace("$LOG_NAME", loggerName)
                     .replace("$LINE_NUMBER", lineNumberText)
                     .replace("$LOG_MESSAGE", buildLogMessage(messageFormat, args));
 
@@ -186,7 +186,7 @@ public class PiLogger implements org.slf4j.Logger {
 
     @Override
     public String getName() {
-        return loggerClass.getName();
+        return loggerName;
     }
 
     @Override
