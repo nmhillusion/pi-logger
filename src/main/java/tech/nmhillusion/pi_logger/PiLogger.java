@@ -60,7 +60,7 @@ public class PiLogger implements org.slf4j.Logger {
                 " -- " +
                 "[$PID]" +
                 " -- " +
-                placeholderAnsiCode(isColoring, AnsiColor.ANSI_PURPLE) + "$LOG_NAME" + placeholderAnsiCode(isColoring, AnsiColor.ANSI_RESET) +
+                placeholderAnsiCode(isColoring, AnsiColor.ANSI_PURPLE) + "$LOG_NAME$LINE_NUMBER" + placeholderAnsiCode(isColoring, AnsiColor.ANSI_RESET) +
                 " : $LOG_MESSAGE";
     }
 
@@ -114,12 +114,26 @@ public class PiLogger implements org.slf4j.Logger {
 
     private void doLog(LogLevel logLevel, String messageFormat, Object... args) {
         final Thread currentThread = Thread.currentThread();
+        final StackTraceElement[] stackTrace = currentThread.getStackTrace();
+        StackTraceElement callerFrame = null;
+        boolean foundSelf = false;
+        for (StackTraceElement element : stackTrace) {
+            final String className = element.getClassName();
+            if (className.contains("PiLogger") && !className.contains("PiLoggerTest")) {
+                foundSelf = true;
+            } else if (foundSelf) {
+                callerFrame = element;
+                break;
+            }
+        }
+
+        final StackTraceElement finalCallerFrame = callerFrame;
         EXECUTOR_SERVICE.execute(() -> {
-            doLogOnThread(currentThread, logLevel, messageFormat, args);
+            doLogOnThread(currentThread, finalCallerFrame, logLevel, messageFormat, args);
         });
     }
 
-    private synchronized void doLogOnThread(Thread currentThread, LogLevel logLevel, String messageFormat, Object... args) {
+    private synchronized void doLogOnThread(Thread currentThread, StackTraceElement callerFrame, LogLevel logLevel, String messageFormat, Object... args) {
         if (logLevel.getPriority() < this.logConfig.getLogLevel().getPriority()) {
             return; // not log this because user don't want to write log in this log level
         }
@@ -130,12 +144,18 @@ public class PiLogger implements org.slf4j.Logger {
                     .map(Throwable.class::cast)
                     .collect(Collectors.toList());
 
+            String lineNumberText = StringConstant.EMPTY;
+            if (logConfig.isDisplayLineNumber() && null != callerFrame) {
+                lineNumberText = ":" + callerFrame.getLineNumber();
+            }
+
             String finalLogMessage = TEMPLATE_REF.get()
                     .replace("$TIMESTAMP", dateFormat.format(Calendar.getInstance().getTime()))
                     .replace("$LOG_LEVEL", logLevel.getValue())
                     .replace("$THREAD_NAME", currentThread.getName())
                     .replace("$PID", String.valueOf(ProcessHandle.current().pid()))
                     .replace("$LOG_NAME", loggerClass.getName())
+                    .replace("$LINE_NUMBER", lineNumberText)
                     .replace("$LOG_MESSAGE", buildLogMessage(messageFormat, args));
 
             if (logConfig.getColoring()) {

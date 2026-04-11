@@ -10,7 +10,9 @@ TDTR;
 
 ```java
 
-PiLoggerHelper.getLog(this).info("hello, logger!!!");
+PiLoggerFactory.getLog(this).
+
+info("hello, logger!!!");
 
 ```
 

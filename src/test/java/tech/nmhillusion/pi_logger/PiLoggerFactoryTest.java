@@ -6,8 +6,8 @@ import tech.nmhillusion.pi_logger.constant.LogLevel;
 
 import java.sql.SQLException;
 
-class PiLoggerHelperTest {
-    private static final PiLogger logger = PiLoggerFactory.getLog(PiLoggerHelperTest.class);
+class PiLoggerFactoryTest {
+    private static final PiLogger logger = PiLoggerFactory.getLog(PiLoggerFactoryTest.class);
 
     @BeforeAll
     static void init() {
@@ -80,5 +80,19 @@ class PiLoggerHelperTest {
         logger.getLogConfig()
                 .setLogLevel(LogLevel.ERROR);
         logger.error("do test error message");
+    }
+
+    @Test
+    void testDisplayLineNumber() {
+        logger.getLogConfig()
+                .setLogLevel(LogLevel.INFO)
+                .setDisplayLineNumber(true);
+
+        logger.info("this message should have line number");
+
+        logger.getLogConfig()
+                .setDisplayLineNumber(false);
+
+        logger.info("this message should NOT have line number");
     }
 }

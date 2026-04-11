@@ -16,6 +16,7 @@ public class LogConfigModel implements Serializable, Cloneable {
     private boolean coloring;
     private String timestampPattern;
     private LogLevel logLevel;
+    private boolean displayLineNumber;
 
     private boolean isOutputToFile = false;
     private String logFilePath;
@@ -100,6 +101,16 @@ public class LogConfigModel implements Serializable, Cloneable {
         return this;
     }
 
+    public boolean isDisplayLineNumber() {
+        return displayLineNumber;
+    }
+
+    public LogConfigModel setDisplayLineNumber(boolean displayLineNumber) {
+        this.displayLineNumber = displayLineNumber;
+        triggerOnChangeConfig();
+        return this;
+    }
+
     @Override
     public LogConfigModel clone() {
         try {
@@ -110,6 +121,7 @@ public class LogConfigModel implements Serializable, Cloneable {
                     .setOnChangeConfig(onChangeConfig)
                     .setIsOutputToFile(isOutputToFile)
                     .setTimestampPattern(timestampPattern)
+                    .setDisplayLineNumber(displayLineNumber)
             ;
             return clone;
         } catch (CloneNotSupportedException e) {
