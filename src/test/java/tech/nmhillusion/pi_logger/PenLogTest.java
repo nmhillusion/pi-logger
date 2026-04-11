@@ -2,6 +2,7 @@ package tech.nmhillusion.pi_logger;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import tech.nmhillusion.pi_logger.factory.PiLoggerFactory;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -12,7 +13,7 @@ import java.util.concurrent.Executors;
  * created date: 2026-04-05
  */
 public class PenLogTest {
-    private final PiLogger logger = PiLoggerFactory.getLog(this);
+    private final PiLogger logger = PiLoggerFactory.getLogger(this);
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     @Test

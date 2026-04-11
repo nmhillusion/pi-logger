@@ -46,7 +46,7 @@ public class PiLogger implements org.slf4j.Logger {
     private final AtomicReference<String> TEMPLATE_REF = new AtomicReference<>();
     private LogConfigModel logConfig;
 
-    protected PiLogger(String loggerName, LogConfigModel logConfig) {
+    public PiLogger(String loggerName, LogConfigModel logConfig) {
         this.loggerName = loggerName;
         setLogConfig(logConfig);
     }

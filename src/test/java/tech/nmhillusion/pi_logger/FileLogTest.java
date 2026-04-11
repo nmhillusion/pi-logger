@@ -1,6 +1,7 @@
 package tech.nmhillusion.pi_logger;
 
 import org.junit.jupiter.api.Test;
+import tech.nmhillusion.pi_logger.factory.PiLoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 
 public class FileLogTest {
-    private final PiLogger logger = PiLoggerFactory.getLog(this);
+    private final PiLogger logger = PiLoggerFactory.getLogger(this);
 
     @Test
     void testWriteFile() {

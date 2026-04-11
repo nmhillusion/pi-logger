@@ -1,6 +1,7 @@
 package tech.nmhillusion.pi_logger;
 
 import org.junit.jupiter.api.Test;
+import tech.nmhillusion.pi_logger.factory.PiLoggerFactory;
 
 /**
  * date: 2022-02-12
@@ -9,7 +10,7 @@ import org.junit.jupiter.api.Test;
  */
 
 public class TimestampPatternLogTest {
-    private final PiLogger logger = PiLoggerFactory.getLog(this);
+    private final PiLogger logger = PiLoggerFactory.getLogger(this);
     
     @Test
     void testTimestampPattern1() {

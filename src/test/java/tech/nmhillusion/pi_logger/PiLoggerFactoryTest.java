@@ -3,11 +3,12 @@ package tech.nmhillusion.pi_logger;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import tech.nmhillusion.pi_logger.constant.LogLevel;
+import tech.nmhillusion.pi_logger.factory.PiLoggerFactory;
 
 import java.sql.SQLException;
 
 class PiLoggerFactoryTest {
-    private static final PiLogger logger = PiLoggerFactory.getLog(PiLoggerFactoryTest.class);
+    private static final PiLogger logger = PiLoggerFactory.getLogger(PiLoggerFactoryTest.class);
 
     @BeforeAll
     static void init() {

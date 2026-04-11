@@ -2,6 +2,7 @@ package tech.nmhillusion.pi_logger;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import tech.nmhillusion.pi_logger.factory.PiLoggerFactory;
 
 /**
  * date: 2023-02-27
@@ -18,14 +19,14 @@ public class SetDefaultConfigLogFactoryTest {
 
   @Test
   void testConfigColorDisplayLineNumber() {
-    final PiLogger logger = PiLoggerFactory.getLog(this);
+    final PiLogger logger = PiLoggerFactory.getLogger(this);
 
     logger.info("test message for testConfigColorDisplayLineNumber");
   }
 
   @Test
   void testConfigColorDisplayLineNumberContinue() {
-    final PiLogger logger = PiLoggerFactory.getLog(this);
+    final PiLogger logger = PiLoggerFactory.getLogger(this);
 
     logger.info("test message for testConfigColorDisplayLineNumber 2");
   }

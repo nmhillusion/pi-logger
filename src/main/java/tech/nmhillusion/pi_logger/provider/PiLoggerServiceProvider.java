@@ -1,4 +1,4 @@
-package tech.nmhillusion.pi_logger;
+package tech.nmhillusion.pi_logger.provider;
 
 import org.slf4j.ILoggerFactory;
 import org.slf4j.IMarkerFactory;
@@ -6,6 +6,7 @@ import org.slf4j.helpers.BasicMarkerFactory;
 import org.slf4j.helpers.NOPMDCAdapter;
 import org.slf4j.spi.MDCAdapter;
 import org.slf4j.spi.SLF4JServiceProvider;
+import tech.nmhillusion.pi_logger.factory.PiLoggerFactory;
 
 public class PiLoggerServiceProvider implements SLF4JServiceProvider {
     public static String REQUESTED_API_VERSION = "2.0.99";

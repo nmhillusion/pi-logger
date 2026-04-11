@@ -1,7 +1,7 @@
-package tech.nmhillusion.pi_logger;
+package tech.nmhillusion.pi_logger.factory;
 
 import org.slf4j.ILoggerFactory;
-import org.slf4j.Logger;
+import tech.nmhillusion.pi_logger.PiLogger;
 import tech.nmhillusion.pi_logger.constant.LogLevel;
 import tech.nmhillusion.pi_logger.model.LogConfigModel;
 
@@ -35,7 +35,7 @@ public class PiLoggerFactory implements ILoggerFactory {
         return defaultLogConfig.clone();
     }
 
-    public static PiLogger getLog(Object client) {
+    public static PiLogger getLogger(Object client) {
         String loggerName = PiLoggerFactory.class.getName();
         if (client instanceof Class) {
             loggerName = ((Class<?>) client).getName();

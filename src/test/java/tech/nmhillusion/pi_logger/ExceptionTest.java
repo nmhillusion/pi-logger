@@ -1,6 +1,7 @@
 package tech.nmhillusion.pi_logger;
 
 import org.junit.jupiter.api.Test;
+import tech.nmhillusion.pi_logger.factory.PiLoggerFactory;
 
 import java.sql.SQLException;
 
@@ -29,7 +30,7 @@ public class ExceptionTest {
         try {
             throwExceptionFunc();
         } catch (Throwable ex) {
-            PiLoggerFactory.getLog(this).error(ex);
+            PiLoggerFactory.getLogger(this).error(ex);
         }
     }
     
@@ -38,7 +39,7 @@ public class ExceptionTest {
         try {
             callToCauseFunc();
         } catch (Throwable ex) {
-            PiLoggerFactory.getLog(this).error(ex);
+            PiLoggerFactory.getLogger(this).error(ex);
         }
     }
 }
