@@ -181,10 +181,20 @@ public class PiLogger implements org.slf4j.Logger {
     }
 
     private String buildLogMessage(String messageFormat, Object[] args) {
+        if (null == args || 0 == args.length) {
+            return messageFormat;
+        }
+
         if (HAS_STRING_FORMAT_PATTERN.matcher(messageFormat).find()) {
             return String.format(messageFormat, args);
+        } else if (messageFormat.contains("{}")) {
+            String finalMessage = messageFormat;
+            for (Object arg : args) {
+                finalMessage = finalMessage.replaceFirst("\\{}", String.valueOf(arg));
+            }
+            return finalMessage;
         } else {
-            return messageFormat +
+            return messageFormat + " " +
                     Stream.of(args).map(String::valueOf).collect(Collectors.joining(" "));
         }
     }
