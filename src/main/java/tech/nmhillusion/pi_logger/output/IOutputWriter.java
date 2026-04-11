@@ -10,4 +10,8 @@ import java.util.List;
  */
 public interface IOutputWriter {
     void doOutput(String outputMessage, List<Throwable> throwableList) throws IOException;
+
+    default void flush() throws IOException {}
+
+    default void close() throws IOException {}
 }

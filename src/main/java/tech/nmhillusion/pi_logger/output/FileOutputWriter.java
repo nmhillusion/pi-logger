@@ -3,10 +3,11 @@ package tech.nmhillusion.pi_logger.output;
 import tech.nmhillusion.pi_logger.constant.AnsiColor;
 import tech.nmhillusion.pi_logger.constant.StringConstant;
 
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.List;
 
 /**
@@ -16,20 +17,34 @@ import java.util.List;
  */
 
 public class FileOutputWriter implements IOutputWriter {
-    private String logFilePath;
+    private static final int FLUSH_INTERVAL = 100;
 
-    public void setOutputLogFile(String logFilePath) {
+    private String logFilePath;
+    private PrintWriter writer;
+    private int writeCount = 0;
+
+    public synchronized void setOutputLogFile(String logFilePath) {
+        if (logFilePath != null && logFilePath.equals(this.logFilePath) && writer != null) {
+            return;
+        }
+
+        try {
+            close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         try {
             final File logFile = new File(logFilePath);
             if (!logFile.exists()) {
                 final boolean createdFile = logFile.createNewFile();
-
                 if (!createdFile) {
                     throw new IOException("Cannot create file log: " + logFilePath);
                 }
             }
 
             this.logFilePath = logFilePath;
+            this.writer = new PrintWriter(new BufferedWriter(new FileWriter(logFilePath, true)), false);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -50,18 +65,41 @@ public class FileOutputWriter implements IOutputWriter {
     }
 
     @Override
-    public void doOutput(String outputMessage, List<Throwable> throwableList) throws IOException {
-        outputMessage = removeColorCharsInMessage(outputMessage);
-        try (final FileOutputStream fileOutputStream = new FileOutputStream(logFilePath, true);
-             final PrintStream printStream = new PrintStream(fileOutputStream, true)) {
+    public synchronized void doOutput(String outputMessage, List<Throwable> throwableList) throws IOException {
+        if (writer == null) {
+            return;
+        }
 
-            printStream.println(outputMessage);
+        writer.println(removeColorCharsInMessage(outputMessage));
 
-            if (null != throwableList) {
-                for (final Throwable throwable_ : throwableList) {
-                    throwable_.printStackTrace(printStream);
-                }
+        if (null != throwableList) {
+            for (final Throwable throwable_ : throwableList) {
+                throwable_.printStackTrace(writer);
             }
+        }
+
+        writeCount++;
+        if (writeCount >= FLUSH_INTERVAL) {
+            writer.flush();
+            writeCount = 0;
+        }
+    }
+
+    @Override
+    public synchronized void flush() throws IOException {
+        if (writer != null) {
+            writer.flush();
+            writeCount = 0;
+        }
+    }
+
+    @Override
+    public synchronized void close() throws IOException {
+        if (writer != null) {
+            writer.flush();
+            writer.close();
+            writer = null;
+            writeCount = 0;
         }
     }
 }
