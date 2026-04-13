@@ -28,17 +28,21 @@ public class DynamicConfigTest {
     @Test
     void testDefaultConfigPropagation() {
         PiLoggerFactory factory = new PiLoggerFactory();
-        
-        // Reset default to INFO
-        PiLoggerFactory.getDefaultLogConfig().setLogLevel(LogLevel.INFO);
-        
-        PiLogger loggerBefore = factory.getLogger("Before");
-        assertEquals(LogLevel.INFO, loggerBefore.getLogConfig().getLogLevel());
+        LogLevel originalLevel = PiLoggerFactory.getDefaultLogConfig().getLogLevel();
+        try {
+            // Reset default to INFO
+            PiLoggerFactory.getDefaultLogConfig().setLogLevel(LogLevel.INFO);
+            
+            PiLogger loggerBefore = factory.getLogger("Before");
+            assertEquals(LogLevel.INFO, loggerBefore.getLogConfig().getLogLevel());
 
-        // Change default to WARN
-        PiLoggerFactory.getDefaultLogConfig().setLogLevel(LogLevel.WARN);
+            // Change default to WARN
+            PiLoggerFactory.getDefaultLogConfig().setLogLevel(LogLevel.WARN);
 
-        PiLogger loggerAfter = factory.getLogger("After");
-        assertEquals(LogLevel.WARN, loggerAfter.getLogConfig().getLogLevel(), "New loggers should inherit the new default config");
+            PiLogger loggerAfter = factory.getLogger("After");
+            assertEquals(LogLevel.WARN, loggerAfter.getLogConfig().getLogLevel(), "New loggers should inherit the new default config");
+        } finally {
+            PiLoggerFactory.getDefaultLogConfig().setLogLevel(originalLevel);
+        }
     }
 }

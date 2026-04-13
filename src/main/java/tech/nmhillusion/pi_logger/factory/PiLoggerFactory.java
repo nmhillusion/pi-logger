@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PiLoggerFactory implements ILoggerFactory {
     private static final Map<String, PiLogger> loggerFactory = new ConcurrentHashMap<>();
     private static final String DEFAULT_DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS";
-    private static final String DEFAULT_LOG_FILE_PATH = "output.log";
+    private static final String DEFAULT_LOG_FILE_PATH = "logs/output.log";
 
     private static final LogConfigModel defaultLogConfig = new LogConfigModel()
             .setColoring(false)
@@ -26,6 +26,8 @@ public class PiLoggerFactory implements ILoggerFactory {
             .setIsOutputToFile(true)
             .setDisplayLineNumber(true)
             .setLogLevel(LogLevel.INFO);
+
+    private static final PiLoggerFactory INSTANCE = new PiLoggerFactory();
 
     public static LogConfigModel getDefaultLogConfig() {
         return defaultLogConfig;
@@ -45,11 +47,11 @@ public class PiLoggerFactory implements ILoggerFactory {
             loggerName = client.getClass().getName();
         }
 
-        return new PiLoggerFactory().getLogger(loggerName);
+        return INSTANCE.getLogger(loggerName);
     }
 
     @Override
     public PiLogger getLogger(String name) {
-        return loggerFactory.computeIfAbsent(name, key -> new PiLogger(key, getLogConfig()));
+        return loggerFactory.computeIfAbsent(name, key -> new PiLogger(key, defaultLogConfig.clone()));
     }
 }

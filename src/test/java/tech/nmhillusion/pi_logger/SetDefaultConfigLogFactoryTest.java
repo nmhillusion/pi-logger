@@ -1,5 +1,6 @@
 package tech.nmhillusion.pi_logger;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import tech.nmhillusion.pi_logger.factory.PiLoggerFactory;
@@ -15,6 +16,12 @@ public class SetDefaultConfigLogFactoryTest {
   static void init() {
     PiLoggerFactory.getDefaultLogConfig()
             .setColoring(true);
+  }
+
+  @AfterAll
+  static void tearDownAll() {
+    PiLoggerFactory.getDefaultLogConfig()
+            .setColoring(false);
   }
 
   @Test

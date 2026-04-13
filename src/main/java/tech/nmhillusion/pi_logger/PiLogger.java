@@ -38,23 +38,18 @@ public class PiLogger implements org.slf4j.Logger {
     private static final String NORMAL_TEMPLATE = getColorTemplate(false);
     private static final String COLOR_TEMPLATE = getColorTemplate(true);
     private static final ConsoleOutputWriter consoleOutputWriter = new ConsoleOutputWriter();
-    private static final FileOutputWriter fileOutputWriter = new FileOutputWriter();
     private static final Pattern HAS_STRING_FORMAT_PATTERN = Pattern.compile("%[a-z]", Pattern.CASE_INSENSITIVE);
 
     static {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             EXECUTOR_SERVICE.shutdown();
-            try {
-                fileOutputWriter.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }));
     }
     private final SimpleDateFormat dateFormat = new SimpleDateFormat();
     private final String loggerName;
     private final List<IOutputWriter> logOutputWriters = new ArrayList<>();
     private final AtomicReference<String> TEMPLATE_REF = new AtomicReference<>();
+    private final FileOutputWriter fileOutputWriter = new FileOutputWriter();
     private LogConfigModel logConfig;
 
     public PiLogger(String loggerName, LogConfigModel logConfig) {
@@ -94,6 +89,11 @@ public class PiLogger implements org.slf4j.Logger {
             logOutputWriters.add(consoleOutputWriter);
             if (logConfig.isOutputToFile()) {
                 fileOutputWriter.setOutputLogFile(logConfig.getLogFilePath());
+                fileOutputWriter.setRotationPolicy(
+                        logConfig.getMaxFileSizeKB(),
+                        logConfig.getMaxFileAgeDays(),
+                        logConfig.getMaxBackupFiles()
+                );
                 logOutputWriters.add(fileOutputWriter);
             }
 
@@ -108,6 +108,11 @@ public class PiLogger implements org.slf4j.Logger {
 
         if (logConfig.isOutputToFile()) {
             fileOutputWriter.setOutputLogFile(logConfig.getLogFilePath());
+            fileOutputWriter.setRotationPolicy(
+                    logConfig.getMaxFileSizeKB(),
+                    logConfig.getMaxFileAgeDays(),
+                    logConfig.getMaxBackupFiles()
+            );
 
             if (!logOutputWriters.contains(fileOutputWriter)) {
                 logOutputWriters.add(fileOutputWriter);
@@ -203,6 +208,19 @@ public class PiLogger implements org.slf4j.Logger {
         for (IOutputWriter outputWriter : logOutputWriters) {
             outputWriter.doOutput(logMessage, throwableList);
         }
+    }
+
+    public java.util.concurrent.Future<Void> flush() {
+        return EXECUTOR_SERVICE.submit(() -> {
+            for (IOutputWriter outputWriter : logOutputWriters) {
+                try {
+                    outputWriter.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        });
     }
 
     @Override

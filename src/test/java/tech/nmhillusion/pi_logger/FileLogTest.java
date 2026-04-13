@@ -23,19 +23,19 @@ public class FileLogTest {
     @Test
     void testWriteFile() {
         logger.getLogConfig()
+                .setLogLevel(tech.nmhillusion.pi_logger.constant.LogLevel.INFO)
                 .setColoring(true)
                 .setIsOutputToFile(true)
         ;
 
-        final String message = "write log to file";
+        final String message = "write log to file - " + System.currentTimeMillis();
         logger.info(message);
 
         final File logFile = new File(logger.getLogConfig().getLogFilePath());
         try {
+            logger.flush().get();
+
             final byte[] bytes = Files.readAllBytes(Paths.get(logFile.toURI()));
-
-            Thread.sleep(3_000);
-
             assertTrue(new String(bytes).contains(message), "Contains message in log file.");
         } catch (Exception e) {
             logger.error(e);
@@ -49,14 +49,16 @@ public class FileLogTest {
                 .setIsOutputToFile(false)
         ;
 
-        final String message = "don't write log to file";
+        final String message = "don't write log to file - " + System.currentTimeMillis();
         logger.info(message);
 
         final File logFile = new File(logger.getLogConfig().getLogFilePath());
         try {
+            logger.flush().get();
+
             final byte[] bytes = Files.readAllBytes(Paths.get(logFile.toURI()));
             assertFalse(new String(bytes).contains(message), "Not contains message in log file.");
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error(e);
         }
     }
