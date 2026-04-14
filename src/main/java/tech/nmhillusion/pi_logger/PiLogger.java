@@ -10,11 +10,11 @@ import tech.nmhillusion.pi_logger.output.FileOutputWriter;
 import tech.nmhillusion.pi_logger.output.IOutputWriter;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
@@ -45,11 +45,11 @@ public class PiLogger implements org.slf4j.Logger {
             EXECUTOR_SERVICE.shutdown();
         }));
     }
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat();
+    private DateTimeFormatter dateTimeFormatter;
     private final String loggerName;
-    private final List<IOutputWriter> logOutputWriters = new ArrayList<>();
+    private final List<IOutputWriter> logOutputWriters = new CopyOnWriteArrayList<>();
     private final AtomicReference<String> TEMPLATE_REF = new AtomicReference<>();
-    private final FileOutputWriter fileOutputWriter = new FileOutputWriter();
+    private FileOutputWriter fileOutputWriter;
     private LogConfigModel logConfig;
 
     public PiLogger(String loggerName, LogConfigModel logConfig) {
@@ -81,13 +81,14 @@ public class PiLogger implements org.slf4j.Logger {
     public PiLogger setLogConfig(LogConfigModel newConfig) {
         if (null != newConfig) {
             this.logConfig = newConfig;
-            dateFormat.applyPattern(newConfig.getTimestampPattern());
+            this.dateTimeFormatter = DateTimeFormatter.ofPattern(newConfig.getTimestampPattern());
 
             TEMPLATE_REF.set(logConfig.getColoring() ? COLOR_TEMPLATE : NORMAL_TEMPLATE);
 
             logOutputWriters.clear();
             logOutputWriters.add(consoleOutputWriter);
             if (logConfig.isOutputToFile()) {
+                this.fileOutputWriter = FileOutputWriter.getSharedInstance(logConfig.getLogFilePath());
                 fileOutputWriter.setOutputLogFile(logConfig.getLogFilePath());
                 fileOutputWriter.setRotationPolicy(
                         logConfig.getMaxFileSizeKB(),
@@ -103,10 +104,11 @@ public class PiLogger implements org.slf4j.Logger {
     }
 
     private synchronized void registerOnChangeConfig(LogConfigModel newConfig) {
-        dateFormat.applyPattern(newConfig.getTimestampPattern());
+        this.dateTimeFormatter = DateTimeFormatter.ofPattern(newConfig.getTimestampPattern());
         TEMPLATE_REF.set(newConfig.getColoring() ? COLOR_TEMPLATE : NORMAL_TEMPLATE);
 
         if (logConfig.isOutputToFile()) {
+            this.fileOutputWriter = FileOutputWriter.getSharedInstance(logConfig.getLogFilePath());
             fileOutputWriter.setOutputLogFile(logConfig.getLogFilePath());
             fileOutputWriter.setRotationPolicy(
                     logConfig.getMaxFileSizeKB(),
@@ -149,7 +151,7 @@ public class PiLogger implements org.slf4j.Logger {
         });
     }
 
-    private synchronized void doLogOnThread(Thread currentThread, StackTraceElement callerFrame, LogLevel logLevel, String messageFormat, Object... args) {
+    private void doLogOnThread(Thread currentThread, StackTraceElement callerFrame, LogLevel logLevel, String messageFormat, Object... args) {
         if (logLevel.getPriority() < this.logConfig.getLogLevel().getPriority()) {
             return; // not log this because user don't want to write log in this log level
         }
@@ -166,7 +168,7 @@ public class PiLogger implements org.slf4j.Logger {
             }
 
             String finalLogMessage = TEMPLATE_REF.get()
-                    .replace("$TIMESTAMP", dateFormat.format(Calendar.getInstance().getTime()))
+                    .replace("$TIMESTAMP", LocalDateTime.now().format(dateTimeFormatter))
                     .replace("$LOG_LEVEL", logLevel.getValue())
                     .replace("$THREAD_NAME", currentThread.getName())
                     .replace("$PID", String.valueOf(ProcessHandle.current().pid()))
