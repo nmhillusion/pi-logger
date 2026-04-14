@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 
 public class FileOutputWriter implements IOutputWriter {
     private static final int FLUSH_INTERVAL = 100;
+    private static final java.util.Map<String, FileOutputWriter> INSTANCES = new java.util.concurrent.ConcurrentHashMap<>();
 
     private String logFilePath;
     private PrintWriter writer;
@@ -31,6 +32,16 @@ public class FileOutputWriter implements IOutputWriter {
     private int maxBackupFiles = 10;
 
     private String parentDirectory;
+
+    public FileOutputWriter() {
+    }
+
+    public static FileOutputWriter getSharedInstance(String logFilePath) {
+        if (logFilePath == null) {
+            return new FileOutputWriter();
+        }
+        return INSTANCES.computeIfAbsent(logFilePath, path -> new FileOutputWriter());
+    }
 
     public synchronized void setOutputLogFile(String logFilePath) {
         final File logFile = new File(logFilePath);
@@ -67,12 +78,31 @@ public class FileOutputWriter implements IOutputWriter {
             this.writer = new PrintWriter(new BufferedWriter(new FileWriter(logFilePath, true)), false);
 
             updatePolicyFileState();
+            
+            // Register this instance if it has a logFilePath
+            if (this.logFilePath != null) {
+                INSTANCES.put(this.logFilePath, this);
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
     private void updatePolicyFileState() {
+        if (rotationPolicy == null) {
+            return;
+        }
+        if (rotationPolicy.getTimePolicy() == null) {
+            return;
+        }
+        if (logFilePath == null) {
+            return;
+        }
+        if (!new File(logFilePath).exists()) {
+            // If the file doesn't exist yet, its last modified time is not relevant.
+            return;
+        }
+
         rotationPolicy.getTimePolicy().setFileStartTime(new File(logFilePath).lastModified());
     }
 
