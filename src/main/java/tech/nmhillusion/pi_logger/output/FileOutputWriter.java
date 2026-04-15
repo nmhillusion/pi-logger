@@ -25,8 +25,6 @@ public class FileOutputWriter implements IOutputWriter {
     private String logFilePath;
     private PrintWriter writer;
     private int writeCount = 0;
-    private long currentFileSizeKB = 0;
-    private long currentFileSizeBytes = 0;
 
     private CompositeRotationPolicy rotationPolicy;
     private int maxBackupFiles = 10;
@@ -73,12 +71,10 @@ public class FileOutputWriter implements IOutputWriter {
 
             this.logFilePath = logFilePath;
             this.parentDirectory = logFile.getParent();
-            this.currentFileSizeBytes = logFile.length();
-            this.currentFileSizeKB = currentFileSizeBytes / 1024;
             this.writer = new PrintWriter(new BufferedWriter(new FileWriter(logFilePath, true)), false);
 
             updatePolicyFileState();
-            
+
             // Register this instance if it has a logFilePath
             if (this.logFilePath != null) {
                 INSTANCES.put(this.logFilePath, this);
@@ -107,15 +103,12 @@ public class FileOutputWriter implements IOutputWriter {
     }
 
     /**
-     * Configure rotation settings.
      *
-     * @param maxFileSizeKB  max file size in KB (0 to disable size-based rotation)
-     * @param maxFileAgeDays max file age in days (0 to disable time-based rotation)
-     * @param maxBackupFiles max number of rotated files to keep
+     * @param rotationPolicy
      */
-    public synchronized void setRotationPolicy(long maxFileSizeKB, int maxFileAgeDays, int maxBackupFiles) {
-        this.maxBackupFiles = maxBackupFiles;
-        this.rotationPolicy = new CompositeRotationPolicy(maxFileSizeKB, maxFileAgeDays, maxBackupFiles);
+    public synchronized void setRotationPolicy(CompositeRotationPolicy.CompositeRotationPolicyConfig rotationPolicy) {
+        this.maxBackupFiles = rotationPolicy.maxBackupFiles();
+        this.rotationPolicy = new CompositeRotationPolicy(rotationPolicy);
         updatePolicyFileState();
     }
 
@@ -132,9 +125,7 @@ public class FileOutputWriter implements IOutputWriter {
             return;
         }
 
-        currentFileSizeKB = currentFileSizeBytes / 1024;
-
-        if (rotationPolicy.shouldRotate(currentFile, currentFileSizeKB)) {
+        if (rotationPolicy.shouldRotate(currentFile)) {
             rotate(currentFile);
         }
     }
@@ -168,8 +159,7 @@ public class FileOutputWriter implements IOutputWriter {
                     currentFile.createNewFile();
                 }
                 writer = new PrintWriter(new BufferedWriter(new FileWriter(logFilePath, true)), false);
-                currentFileSizeBytes = 0;
-                currentFileSizeKB = 0;
+
                 updatePolicyFileState();
             } catch (IOException moveEx) {
                 // If move failed, try to reopen in append mode
@@ -235,7 +225,6 @@ public class FileOutputWriter implements IOutputWriter {
 
         String messageToPrint = removeColorCharsInMessage(outputMessage);
         writer.println(messageToPrint);
-        currentFileSizeBytes += messageToPrint.length() + System.lineSeparator().length();
 
         if (null != throwableList) {
             for (final Throwable throwable_ : throwableList) {
@@ -248,9 +237,6 @@ public class FileOutputWriter implements IOutputWriter {
         if (writeCount >= FLUSH_INTERVAL) {
             writer.flush();
             writeCount = 0;
-
-            // Periodically sync with disk size to be sure
-            currentFileSizeBytes = new File(logFilePath).length();
         }
     }
 

@@ -14,10 +14,10 @@ public interface RotationPolicy {
      * Check if rotation should occur based on current file state.
      *
      * @param currentFile the current log file
-     * @param fileSizeKB  current file size in KB
+     * @param fileSizeMB  current file size in KB
      * @return true if rotation should occur
      */
-    boolean shouldRotate(File currentFile, long fileSizeKB);
+    boolean shouldRotate(File currentFile);
 
     /**
      * Generate a rotated filename for the old log file.

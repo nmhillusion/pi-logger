@@ -7,7 +7,7 @@ import java.util.Date;
 /**
  * Composite rotation policy that combines multiple policies.
  * Rotation occurs if ANY of the contained policies indicate rotation is needed.
- *
+ * <p>
  * date: 2026-04-12
  * <p>
  * created-by: nmhillusion
@@ -18,21 +18,17 @@ public class CompositeRotationPolicy implements RotationPolicy {
     private final int maxBackupFiles;
     private final SimpleDateFormat timestampFormat;
 
-    public CompositeRotationPolicy(long maxSizeKB, int maxAgeDays, int maxBackupFiles) {
-        this(maxSizeKB, maxAgeDays, maxBackupFiles, "yyyy-MM-dd_HH-mm-ss_SSS");
-    }
-
-    public CompositeRotationPolicy(long maxSizeKB, int maxAgeDays, int maxBackupFiles, String timestampPattern) {
-        this.sizePolicy = new SizeRotationPolicy(maxSizeKB, timestampPattern);
-        this.timePolicy = new TimeRotationPolicy(maxAgeDays, timestampPattern);
-        this.maxBackupFiles = maxBackupFiles;
-        this.timestampFormat = new SimpleDateFormat(timestampPattern);
+    public CompositeRotationPolicy(CompositeRotationPolicyConfig property) {
+        this.sizePolicy = new SizeRotationPolicy(property.maxFileSizeMB(), property.timestampPattern());
+        this.timePolicy = new TimeRotationPolicy(property.maxFileAgeDays(), property.timestampPattern());
+        this.maxBackupFiles = property.maxBackupFiles();
+        this.timestampFormat = new SimpleDateFormat(property.timestampPattern());
     }
 
     @Override
-    public boolean shouldRotate(File currentFile, long fileSizeKB) {
-        return sizePolicy.shouldRotate(currentFile, fileSizeKB) ||
-               timePolicy.shouldRotate(currentFile, fileSizeKB);
+    public boolean shouldRotate(File currentFile) {
+        return sizePolicy.shouldRotate(currentFile) ||
+                timePolicy.shouldRotate(currentFile);
     }
 
     @Override
@@ -51,5 +47,9 @@ public class CompositeRotationPolicy implements RotationPolicy {
 
     public TimeRotationPolicy getTimePolicy() {
         return timePolicy;
+    }
+
+    public record CompositeRotationPolicyConfig(int maxFileSizeMB, int maxFileAgeDays, int maxBackupFiles,
+                                                String timestampPattern) {
     }
 }

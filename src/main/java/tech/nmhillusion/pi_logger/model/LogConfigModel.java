@@ -21,7 +21,7 @@ public class LogConfigModel implements Serializable, Cloneable {
     private boolean isOutputToFile = false;
     private String logFilePath;
 
-    private long maxFileSizeKB = 10240;  // 10MB default, 0 to disable
+    private int maxFileSizeMB = 1024;  // 1GB default, 0 to disable
     private int maxFileAgeDays = 7;       // 7 days default, 0 to disable
     private int maxBackupFiles = 10;      // keep 10 rotated files by default
 
@@ -115,12 +115,12 @@ public class LogConfigModel implements Serializable, Cloneable {
         return this;
     }
 
-    public long getMaxFileSizeKB() {
-        return maxFileSizeKB;
+    public int getMaxFileSizeMB() {
+        return maxFileSizeMB;
     }
 
-    public LogConfigModel setMaxFileSizeKB(long maxFileSizeKB) {
-        this.maxFileSizeKB = maxFileSizeKB;
+    public LogConfigModel setMaxFileSizeMB(int maxFileSizeMB) {
+        this.maxFileSizeMB = maxFileSizeMB;
         triggerOnChangeConfig();
         return this;
     }
@@ -156,7 +156,7 @@ public class LogConfigModel implements Serializable, Cloneable {
                     .setIsOutputToFile(isOutputToFile)
                     .setTimestampPattern(timestampPattern)
                     .setDisplayLineNumber(displayLineNumber)
-                    .setMaxFileSizeKB(maxFileSizeKB)
+                    .setMaxFileSizeMB(maxFileSizeMB)
                     .setMaxFileAgeDays(maxFileAgeDays)
                     .setMaxBackupFiles(maxBackupFiles)
             ;

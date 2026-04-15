@@ -5,6 +5,7 @@ import tech.nmhillusion.pi_logger.constant.AnsiColor;
 import tech.nmhillusion.pi_logger.constant.LogLevel;
 import tech.nmhillusion.pi_logger.constant.StringConstant;
 import tech.nmhillusion.pi_logger.model.LogConfigModel;
+import tech.nmhillusion.pi_logger.output.CompositeRotationPolicy;
 import tech.nmhillusion.pi_logger.output.ConsoleOutputWriter;
 import tech.nmhillusion.pi_logger.output.FileOutputWriter;
 import tech.nmhillusion.pi_logger.output.IOutputWriter;
@@ -39,16 +40,16 @@ public class PiLogger implements org.slf4j.Logger {
     private static final String COLOR_TEMPLATE = getColorTemplate(true);
     private static final ConsoleOutputWriter consoleOutputWriter = new ConsoleOutputWriter();
     private static final Pattern HAS_STRING_FORMAT_PATTERN = Pattern.compile("%[a-z]", Pattern.CASE_INSENSITIVE);
+    private static final String ROTATE_TIMESTAMP_SIGNATURE = "yyyy-MM-dd_HH-mm-ss_SSS";
 
     static {
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            EXECUTOR_SERVICE.shutdown();
-        }));
+        Runtime.getRuntime().addShutdownHook(new Thread(EXECUTOR_SERVICE::shutdown));
     }
-    private DateTimeFormatter dateTimeFormatter;
+
     private final String loggerName;
     private final List<IOutputWriter> logOutputWriters = new CopyOnWriteArrayList<>();
     private final AtomicReference<String> TEMPLATE_REF = new AtomicReference<>();
+    private DateTimeFormatter dateTimeFormatter;
     private FileOutputWriter fileOutputWriter;
     private LogConfigModel logConfig;
 
@@ -91,9 +92,12 @@ public class PiLogger implements org.slf4j.Logger {
                 this.fileOutputWriter = FileOutputWriter.getSharedInstance(logConfig.getLogFilePath());
                 fileOutputWriter.setOutputLogFile(logConfig.getLogFilePath());
                 fileOutputWriter.setRotationPolicy(
-                        logConfig.getMaxFileSizeKB(),
-                        logConfig.getMaxFileAgeDays(),
-                        logConfig.getMaxBackupFiles()
+                        new CompositeRotationPolicy.CompositeRotationPolicyConfig(
+                                logConfig.getMaxFileSizeMB(),
+                                logConfig.getMaxFileAgeDays(),
+                                logConfig.getMaxBackupFiles(),
+                                ROTATE_TIMESTAMP_SIGNATURE
+                        )
                 );
                 logOutputWriters.add(fileOutputWriter);
             }
@@ -111,9 +115,12 @@ public class PiLogger implements org.slf4j.Logger {
             this.fileOutputWriter = FileOutputWriter.getSharedInstance(logConfig.getLogFilePath());
             fileOutputWriter.setOutputLogFile(logConfig.getLogFilePath());
             fileOutputWriter.setRotationPolicy(
-                    logConfig.getMaxFileSizeKB(),
-                    logConfig.getMaxFileAgeDays(),
-                    logConfig.getMaxBackupFiles()
+                    new CompositeRotationPolicy.CompositeRotationPolicyConfig(
+                            logConfig.getMaxFileSizeMB(),
+                            logConfig.getMaxFileAgeDays(),
+                            logConfig.getMaxBackupFiles(),
+                            ROTATE_TIMESTAMP_SIGNATURE
+                    )
             );
 
             if (!logOutputWriters.contains(fileOutputWriter)) {

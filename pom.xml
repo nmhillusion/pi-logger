@@ -6,7 +6,7 @@
 
     <groupId>tech.nmhillusion</groupId>
     <artifactId>pi-logger</artifactId>
-    <version>2026.2.1</version>
+    <version>2026.2.2</version>
 
     <properties>
         <java.version>17</java.version>

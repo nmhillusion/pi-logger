@@ -36,7 +36,7 @@ public class TimeRotationPolicy implements RotationPolicy {
     }
 
     @Override
-    public boolean shouldRotate(File currentFile, long fileSizeKB) {
+    public boolean shouldRotate(File currentFile) {
         if (maxAgeDays <= 0 || !currentFile.exists()) {
             return false;
         }

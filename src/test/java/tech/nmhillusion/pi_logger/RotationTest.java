@@ -7,8 +7,6 @@ import tech.nmhillusion.pi_logger.factory.PiLoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -51,7 +49,7 @@ public class RotationTest {
                 .setLogLevel(tech.nmhillusion.pi_logger.constant.LogLevel.INFO)
                 .setIsOutputToFile(true)
                 .setLogFilePath(SIZE_LOG_FILE_PATH)
-                .setMaxFileSizeKB(1) // 1KB
+                .setMaxFileSizeMB(1) // 1KB
                 .setMaxBackupFiles(2);
 
         // Write enough data to trigger rotation (> 1KB)
