@@ -221,15 +221,15 @@ public class PiLogger implements org.slf4j.Logger {
 
     public java.util.concurrent.Future<Void> flush() {
         return EXECUTOR_SERVICE.submit(() -> {
-            for (IOutputWriter outputWriter : logOutputWriters) {
-                try {
-                    outputWriter.flush();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            forceFlush();
             return null;
         });
+    }
+
+    public void forceFlush() throws IOException {
+        for (final IOutputWriter outputWriter : logOutputWriters) {
+            outputWriter.flush();
+        }
     }
 
     @Override
