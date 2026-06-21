@@ -4,6 +4,7 @@ import org.slf4j.Marker;
 import tech.nmhillusion.pi_logger.constant.AnsiColor;
 import tech.nmhillusion.pi_logger.constant.LogLevel;
 import tech.nmhillusion.pi_logger.constant.StringConstant;
+import tech.nmhillusion.pi_logger.factory.PiLoggerFactory;
 import tech.nmhillusion.pi_logger.model.LogConfigModel;
 import tech.nmhillusion.pi_logger.output.CompositeRotationPolicy;
 import tech.nmhillusion.pi_logger.output.ConsoleOutputWriter;
@@ -41,6 +42,7 @@ public class PiLogger implements org.slf4j.Logger {
     private static final ConsoleOutputWriter consoleOutputWriter = new ConsoleOutputWriter();
     private static final Pattern HAS_STRING_FORMAT_PATTERN = Pattern.compile("%[a-z]", Pattern.CASE_INSENSITIVE);
     private static final String ROTATE_TIMESTAMP_SIGNATURE = "yyyy-MM-dd_HH-mm-ss_SSS";
+    private static final LogConfigModel logConfig = PiLoggerFactory.getLogConfig();
 
     static {
         Runtime.getRuntime().addShutdownHook(new Thread(EXECUTOR_SERVICE::shutdown));
@@ -51,11 +53,10 @@ public class PiLogger implements org.slf4j.Logger {
     private final AtomicReference<String> TEMPLATE_REF = new AtomicReference<>();
     private DateTimeFormatter dateTimeFormatter;
     private FileOutputWriter fileOutputWriter;
-    private LogConfigModel logConfig;
 
-    public PiLogger(String loggerName, LogConfigModel logConfig) {
+    public PiLogger(String loggerName) {
         this.loggerName = loggerName;
-        setLogConfig(logConfig);
+        setLogConfig();
     }
 
     private static String getColorTemplate(boolean isColoring) {
@@ -75,39 +76,25 @@ public class PiLogger implements org.slf4j.Logger {
         return isColoring ? replacementAnsiCode : StringConstant.EMPTY;
     }
 
-    public LogConfigModel getLogConfig() {
+    public static LogConfigModel getLogConfig() {
         return logConfig;
     }
 
-    public PiLogger setLogConfig(LogConfigModel newConfig) {
-        if (null != newConfig) {
-            this.logConfig = newConfig;
-            this.dateTimeFormatter = DateTimeFormatter.ofPattern(newConfig.getTimestampPattern());
+    public PiLogger setLogConfig() {
+        addOutputWriter(consoleOutputWriter);
+        this.registerOnChangeConfig(logConfig);
 
-            TEMPLATE_REF.set(logConfig.getColoring() ? COLOR_TEMPLATE : NORMAL_TEMPLATE);
-
-            logOutputWriters.clear();
-            logOutputWriters.add(consoleOutputWriter);
-            if (logConfig.isOutputToFile()) {
-                this.fileOutputWriter = FileOutputWriter.getSharedInstance(logConfig.getLogFilePath());
-                fileOutputWriter.setOutputLogFile(logConfig.getLogFilePath());
-                fileOutputWriter.setRotationPolicy(
-                        new CompositeRotationPolicy.CompositeRotationPolicyConfig(
-                                logConfig.getMaxFileSizeMB(),
-                                logConfig.getMaxFileAgeDays(),
-                                logConfig.getMaxBackupFiles(),
-                                ROTATE_TIMESTAMP_SIGNATURE
-                        )
-                );
-                logOutputWriters.add(fileOutputWriter);
-            }
-
-            this.logConfig.setOnChangeConfig(this::registerOnChangeConfig);
-        }
+        logConfig.setOnChangeConfig(this::registerOnChangeConfig);
         return this;
     }
 
     private synchronized void registerOnChangeConfig(LogConfigModel newConfig) {
+        try {
+            this.forceFlush();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         this.dateTimeFormatter = DateTimeFormatter.ofPattern(newConfig.getTimestampPattern());
         TEMPLATE_REF.set(newConfig.getColoring() ? COLOR_TEMPLATE : NORMAL_TEMPLATE);
 
@@ -124,7 +111,7 @@ public class PiLogger implements org.slf4j.Logger {
             );
 
             if (!logOutputWriters.contains(fileOutputWriter)) {
-                logOutputWriters.add(fileOutputWriter);
+                addOutputWriter(fileOutputWriter);
             }
         } else {
             logOutputWriters.removeIf(FileOutputWriter.class::isInstance);
@@ -137,14 +124,17 @@ public class PiLogger implements org.slf4j.Logger {
         }
     }
 
-    private void doLog(LogLevel logLevel, String messageFormat, Object... args) {
-        final Thread currentThread = Thread.currentThread();
+    private StackTraceElement getCallerFrameFromStackTrace(Thread currentThread) {
         final StackTraceElement[] stackTrace = currentThread.getStackTrace();
         StackTraceElement callerFrame = null;
         boolean foundSelf = false;
         for (StackTraceElement element : stackTrace) {
-            final String className = element.getClassName();
-            if (className.contains("PiLogger") && !className.contains("PiLoggerTest")) {
+            String className = element.getClassName();
+            if (className.contains("$")) {
+                className = className.substring(0, className.indexOf("$"));
+            }
+
+            if (className.equals(getClass().getName())) {
                 foundSelf = true;
             } else if (foundSelf) {
                 callerFrame = element;
@@ -152,19 +142,25 @@ public class PiLogger implements org.slf4j.Logger {
             }
         }
 
-        final StackTraceElement finalCallerFrame = callerFrame;
+        return callerFrame;
+    }
+
+    private void doLog(LogLevel logLevel, String messageFormat, Object... args) {
+        final Thread currentThread = Thread.currentThread();
+        final StackTraceElement finalCallerFrame = getCallerFrameFromStackTrace(currentThread);
+
         EXECUTOR_SERVICE.execute(() -> {
             doLogOnThread(currentThread, finalCallerFrame, logLevel, messageFormat, args);
         });
     }
 
     private void doLogOnThread(Thread currentThread, StackTraceElement callerFrame, LogLevel logLevel, String messageFormat, Object... args) {
-        if (logLevel.getPriority() < this.logConfig.getLogLevel().getPriority()) {
+        if (logLevel.getPriority() < logConfig.getLogLevel().getPriority()) {
             return; // not log this because user don't want to write log in this log level
         }
 
         try {
-            List<Throwable> throwableFromArgs = Arrays.stream(args)
+            final List<Throwable> throwableFromArgs = Arrays.stream(args)
                     .filter(Throwable.class::isInstance)
                     .map(Throwable.class::cast)
                     .collect(Collectors.toList());
@@ -266,7 +262,7 @@ public class PiLogger implements org.slf4j.Logger {
     }
 
     public void trace(String logMessage, Throwable throwable) {
-        trace(logMessage, new Object[]{throwable});
+        doLog(LogLevel.TRACE, logMessage, throwable);
     }
 
     @Override
@@ -328,7 +324,7 @@ public class PiLogger implements org.slf4j.Logger {
     }
 
     public void debug(String logMessage, Throwable throwable) {
-        debug(logMessage, new Object[]{throwable});
+        doLog(LogLevel.DEBUG, logMessage, throwable);
     }
 
     @Override
@@ -390,7 +386,7 @@ public class PiLogger implements org.slf4j.Logger {
     }
 
     public void info(String logMessage, Throwable throwable) {
-        info(logMessage, new Object[]{throwable});
+        doLog(LogLevel.INFO, logMessage, throwable);
     }
 
     @Override
@@ -452,7 +448,7 @@ public class PiLogger implements org.slf4j.Logger {
     }
 
     public void warn(String logMessage, Throwable throwable) {
-        warn(logMessage, new Object[]{throwable});
+        doLog(LogLevel.WARN, logMessage, throwable);
     }
 
     @Override

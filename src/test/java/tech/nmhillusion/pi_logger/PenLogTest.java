@@ -1,5 +1,6 @@
 package tech.nmhillusion.pi_logger;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import tech.nmhillusion.pi_logger.factory.PiLoggerFactory;
@@ -23,9 +24,14 @@ public class PenLogTest {
     private final PiLogger logger = PiLoggerFactory.getLogger(this);
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
+    @AfterEach
+    void afterEach() {
+        logger.flush();
+    }
+
     @Test
     public void testPenLog() {
-        logger.getLogConfig()
+        PiLogger.getLogConfig()
                 .setColoring(true)
                 .setIsOutputToFile(true)
         ;
@@ -41,7 +47,7 @@ public class PenLogTest {
 
     @Test
     public void testPenLogWithMultiThread() {
-        logger.getLogConfig()
+        PiLogger.getLogConfig()
                 .setColoring(true)
                 .setIsOutputToFile(true)
         ;
@@ -64,7 +70,7 @@ public class PenLogTest {
 
     @Test
     public void testPenLogWithExecutorService() {
-        logger.getLogConfig()
+        PiLogger.getLogConfig()
                 .setColoring(true)
                 .setIsOutputToFile(true)
         ;

@@ -1,10 +1,10 @@
 package tech.nmhillusion.pi_logger;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import tech.nmhillusion.pi_logger.factory.PiLoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -20,9 +20,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class FileLogTest {
     private final PiLogger logger = PiLoggerFactory.getLogger(this);
 
+    @AfterEach
+    void afterEach() {
+        logger.flush();
+    }
+
     @Test
     void testWriteFile() {
-        logger.getLogConfig()
+        PiLogger.getLogConfig()
                 .setLogLevel(tech.nmhillusion.pi_logger.constant.LogLevel.INFO)
                 .setColoring(true)
                 .setIsOutputToFile(true)
@@ -31,7 +36,7 @@ public class FileLogTest {
         final String message = "write log to file - " + System.currentTimeMillis();
         logger.info(message);
 
-        final File logFile = new File(logger.getLogConfig().getLogFilePath());
+        final File logFile = new File(PiLogger.getLogConfig().getLogFilePath());
         try {
             logger.flush().get();
 
@@ -44,7 +49,7 @@ public class FileLogTest {
 
     @Test
     void testNoWriteFile() {
-        logger.getLogConfig()
+        PiLogger.getLogConfig()
                 .setColoring(true)
                 .setIsOutputToFile(false)
         ;
@@ -52,7 +57,7 @@ public class FileLogTest {
         final String message = "don't write log to file - " + System.currentTimeMillis();
         logger.info(message);
 
-        final File logFile = new File(logger.getLogConfig().getLogFilePath());
+        final File logFile = new File(PiLogger.getLogConfig().getLogFilePath());
         try {
             logger.flush().get();
 

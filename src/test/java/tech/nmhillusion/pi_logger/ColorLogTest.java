@@ -1,5 +1,6 @@
 package tech.nmhillusion.pi_logger;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import tech.nmhillusion.pi_logger.factory.PiLoggerFactory;
 
@@ -11,6 +12,11 @@ import tech.nmhillusion.pi_logger.factory.PiLoggerFactory;
 
 public class ColorLogTest {
     private final PiLogger logger = PiLoggerFactory.getLogger(this);
+
+    @AfterEach
+    void afterEach() {
+        logger.flush();
+    }
 
     @Test
     void testColoring() {
@@ -29,5 +35,4 @@ public class ColorLogTest {
 
         logger.info("log without color");
     }
-
 }

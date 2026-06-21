@@ -52,6 +52,6 @@ public class PiLoggerFactory implements ILoggerFactory {
 
     @Override
     public PiLogger getLogger(String name) {
-        return loggerFactory.computeIfAbsent(name, key -> new PiLogger(key, defaultLogConfig.clone()));
+        return loggerFactory.computeIfAbsent(name, PiLogger::new);
     }
 }

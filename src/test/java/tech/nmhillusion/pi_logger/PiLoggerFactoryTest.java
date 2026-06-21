@@ -1,5 +1,6 @@
 package tech.nmhillusion.pi_logger;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import tech.nmhillusion.pi_logger.constant.LogLevel;
@@ -12,21 +13,26 @@ class PiLoggerFactoryTest {
 
     @BeforeAll
     static void init() {
-        logger.getLogConfig()
+        PiLogger.getLogConfig()
                 .setColoring(true)
                 .setTimestampPattern("yyyy-MM-dd HH:mm:ss.SSS")
                 .setLogLevel(LogLevel.ERROR)
         ;
     }
 
+    @AfterEach
+    void afterEach() {
+        logger.flush();
+    }
+
     @Test
     void testTrace() {
-        logger.getLogConfig()
+        PiLogger.getLogConfig()
                 .setLogLevel(LogLevel.TRACE);
 
         logger.trace("do test trace message");
 
-        logger.getLogConfig()
+        PiLogger.getLogConfig()
                 .setLogLevel(LogLevel.INFO);
 
         logger.trace("will not log this message");
@@ -34,12 +40,12 @@ class PiLoggerFactoryTest {
 
     @Test
     void testDebug() {
-        logger.getLogConfig()
+        PiLogger.getLogConfig()
                 .setLogLevel(LogLevel.DEBUG);
 
         logger.debug("do test debug message");
 
-        logger.getLogConfig()
+        PiLogger.getLogConfig()
                 .setLogLevel(LogLevel.INFO);
 
         logger.debug("will not log this message");
@@ -47,12 +53,12 @@ class PiLoggerFactoryTest {
 
     @Test
     void testInfo() {
-        logger.getLogConfig()
+        PiLogger.getLogConfig()
                 .setLogLevel(LogLevel.INFO);
 
         logger.info("do test info message");
 
-        logger.getLogConfig()
+        PiLogger.getLogConfig()
                 .setLogLevel(LogLevel.WARN);
 
         logger.info("will not log this message");
@@ -60,12 +66,12 @@ class PiLoggerFactoryTest {
 
     @Test
     void testWarn() {
-        logger.getLogConfig()
+        PiLogger.getLogConfig()
                 .setLogLevel(LogLevel.WARN);
 
         logger.warn("do test warn message");
 
-        logger.getLogConfig()
+        PiLogger.getLogConfig()
                 .setLogLevel(LogLevel.ERROR);
 
         logger.warn("will not log this message");
@@ -73,26 +79,26 @@ class PiLoggerFactoryTest {
 
     @Test
     void testError() {
-        logger.getLogConfig()
+        PiLogger.getLogConfig()
                 .setLogLevel(LogLevel.INFO);
 
         logger.error("do test error message with exception: ", new SQLException("Random Fatal Error"));
 
-        logger.getLogConfig()
+        PiLogger.getLogConfig()
                 .setLogLevel(LogLevel.ERROR);
         logger.error("do test error message");
     }
 
     @Test
     void testDisplayLineNumber() {
-        logger.getLogConfig()
+        PiLogger.getLogConfig()
                 .setLogLevel(LogLevel.INFO)
                 .setDisplayLineNumber(true);
 
         logger.info("this message should have line number");
 
-        logger.getLogConfig()
-                .setDisplayLineNumber(false);
+//        PiLogger.getLogConfig()
+//                .setDisplayLineNumber(false);
 
         logger.info("this message should NOT have line number");
     }
