@@ -13,6 +13,7 @@ import tech.nmhillusion.pi_logger.output.IOutputWriter;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
@@ -184,7 +185,7 @@ public class PiLogger implements org.slf4j.Logger {
             }
 
             String finalLogMessage = TEMPLATE_REF.get()
-                    .replace("$TIMESTAMP", LocalDateTime.now().format(dateTimeFormatter))
+                    .replace("$TIMESTAMP", ZonedDateTime.now().format(dateTimeFormatter))
                     .replace("$LOG_LEVEL", logLevel.getValue())
                     .replace("$THREAD_NAME", currentThread.getName())
                     .replace("$PID", String.valueOf(ProcessHandle.current().pid()))
