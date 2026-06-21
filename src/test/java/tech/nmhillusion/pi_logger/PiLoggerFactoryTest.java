@@ -32,10 +32,14 @@ class PiLoggerFactoryTest {
 
         logger.trace("do test trace message");
 
+        logger.flush();
+
         PiLogger.getLogConfig()
                 .setLogLevel(LogLevel.INFO);
 
         logger.trace("will not log this message");
+
+        logger.flush();
     }
 
     @Test
@@ -71,10 +75,14 @@ class PiLoggerFactoryTest {
 
         logger.warn("do test warn message");
 
+        logger.flush();
+
         PiLogger.getLogConfig()
                 .setLogLevel(LogLevel.ERROR);
 
         logger.warn("will not log this message");
+
+        logger.flush();
     }
 
     @Test
@@ -84,9 +92,13 @@ class PiLoggerFactoryTest {
 
         logger.error("do test error message with exception: ", new SQLException("Random Fatal Error"));
 
+        logger.flush();
+
         PiLogger.getLogConfig()
                 .setLogLevel(LogLevel.ERROR);
         logger.error("do test error message");
+
+        logger.flush();
     }
 
     @Test
@@ -97,8 +109,10 @@ class PiLoggerFactoryTest {
 
         logger.info("this message should have line number");
 
-//        PiLogger.getLogConfig()
-//                .setDisplayLineNumber(false);
+        logger.flush();
+
+        PiLogger.getLogConfig()
+                .setDisplayLineNumber(false);
 
         logger.info("this message should NOT have line number");
     }

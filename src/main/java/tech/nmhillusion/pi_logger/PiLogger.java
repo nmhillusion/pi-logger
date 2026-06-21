@@ -16,9 +16,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.Queue;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -43,6 +42,7 @@ public class PiLogger implements org.slf4j.Logger {
     private static final Pattern HAS_STRING_FORMAT_PATTERN = Pattern.compile("%[a-z]", Pattern.CASE_INSENSITIVE);
     private static final String ROTATE_TIMESTAMP_SIGNATURE = "yyyy-MM-dd_HH-mm-ss_SSS";
     private static final LogConfigModel logConfig = PiLoggerFactory.getLogConfig();
+    private static final Queue<Future<?>> TASK_QUEUE = new java.util.concurrent.ConcurrentLinkedQueue<>();
 
     static {
         Runtime.getRuntime().addShutdownHook(new Thread(EXECUTOR_SERVICE::shutdown));
@@ -89,11 +89,7 @@ public class PiLogger implements org.slf4j.Logger {
     }
 
     private synchronized void registerOnChangeConfig(LogConfigModel newConfig) {
-        try {
-            this.forceFlush();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        this.forceFlush();
 
         this.dateTimeFormatter = DateTimeFormatter.ofPattern(newConfig.getTimestampPattern());
         TEMPLATE_REF.set(newConfig.getColoring() ? COLOR_TEMPLATE : NORMAL_TEMPLATE);
@@ -149,9 +145,26 @@ public class PiLogger implements org.slf4j.Logger {
         final Thread currentThread = Thread.currentThread();
         final StackTraceElement finalCallerFrame = getCallerFrameFromStackTrace(currentThread);
 
-        EXECUTOR_SERVICE.execute(() -> {
+        final Future<?> submittedTask = EXECUTOR_SERVICE.submit(() -> {
             doLogOnThread(currentThread, finalCallerFrame, logLevel, messageFormat, args);
         });
+
+        addTaskToQueue(submittedTask);
+    }
+
+    private void addTaskToQueue(Future<?> submittedTask) {
+        TASK_QUEUE.add(submittedTask);
+        TASK_QUEUE.removeIf(Future::isDone);
+    }
+
+    private void flushQueue() {
+        for (Future<?> future : TASK_QUEUE) {
+            try {
+                future.get();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace(System.out);
+            }
+        }
     }
 
     private void doLogOnThread(Thread currentThread, StackTraceElement callerFrame, LogLevel logLevel, String messageFormat, Object... args) {
@@ -216,15 +229,25 @@ public class PiLogger implements org.slf4j.Logger {
     }
 
     public java.util.concurrent.Future<Void> flush() {
+        flushQueue();
         return EXECUTOR_SERVICE.submit(() -> {
-            forceFlush();
+            _flush();
             return null;
         });
     }
 
-    public void forceFlush() throws IOException {
+    private void _flush() throws IOException {
         for (final IOutputWriter outputWriter : logOutputWriters) {
             outputWriter.flush();
+        }
+    }
+
+    public void forceFlush() {
+        try {
+            flushQueue();
+            _flush();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
